@@ -59,18 +59,17 @@ backups[0].wal_file_size
 backups[0].timeline
 => 1
 
-backups[0].begin_wal
-=> #<RBarman::WalFile:0x00000001a82720 @xlog="0000058F", @timeline="00000001", @segment="000000B0">
+backups[0].begin_wal.xlog
+=> "0000058F"
 
-backups[0].end_wal
-=> #<RBarman::WalFile:0x00000001a81780 @xlog="00000592", @timeline="00000001", @segment="000000A5">
+backups[0].end_wal.segment
+=> "000000A5"
 
 backups[0].wal_files.count
 => 9019
 
-backups[0].wal_files[1022]
-=> #<RBarman::WalFile:0x00000001f629c0 @created=2013-03-05 01:42:14 +0100, @timeline="00000001", @size=4950960, @compress
-ion=:bzip2, @xlog="00000597", @segment="0000009E">
+backups[0].wal_files[1022].compression
+=> :bzip2
 </pre>
 
 ### Get just one backup without wal files
