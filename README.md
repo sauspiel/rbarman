@@ -25,7 +25,7 @@ Or install it yourself as:
 
 This will call pgbarman and some other sources (backup.info, xlog.db) to get information about your backups. This could take several minutes (and  memory) if you have many backups with thousand of wal files. If you don't want to scan for wal file information, use RBarman::Backups.all('server', false)
 
-```ruby
+<pre>
 backups = RBarman::Backups.all('server', true)
 backups.count
 => 3
@@ -71,39 +71,38 @@ backups[0].wal_files.count
 backups[0].wal_files[1022]
 => #<RBarman::WalFile:0x00000001f629c0 @created=2013-03-05 01:42:14 +0100, @timeline="00000001", @size=4950960, @compress
 ion=:bzip2, @xlog="00000597", @segment="0000009E">
-```
+</pre>
 
 ### Get just one backup without wal files
 
-```ruby
+<pre>
 backup = RBarman::Backups.by_id('server', '20130225T192654', false)
 p "id: #{backup.id}|size: #{backup.size / (1024 ** 3) }GB|wal size: #{backup.wal_file_size / (1024 ** 3)} GB"
 => "id: 20130225T192654|size: 217GB|wal size: 72 GB"
-
-```
+</pre>
 
 ### Create a backup
 
 Creates a new backup (and probably takes some time)
 
-```ruby
+<pre>
 b = RBarman::Backup.create('server')
 p b.id
 => "20130304T131422"
-```
+</pre>
 
 ### Delete a backup
 
 This tells pgbarman to delete the specified backup
 
-```ruby
+<pre>
 backup = RBarman::Backup.by_id('server', '20130225T192654', false)
 p backup.deleted
 => false
 backup.delete
 p backup.deleted
 => true
-```
+</pre>
 
 ### Not yet implemented
 
