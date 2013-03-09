@@ -1,7 +1,7 @@
 module RBarman
   class Backups < Array
     def initialize(other=nil)
-      self.concat(other) if !other.nil? and other.is_a? Backups
+      self.concat(other) if !other.nil? and other.is_a? Array
     end
 
     def self.all(server, with_wal_files=true)

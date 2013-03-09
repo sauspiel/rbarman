@@ -13,6 +13,11 @@ describe Backups do
     end
 
     it 'should append elements from other backups' do
+      b2 = Array.new
+      b2 << Backup.new.tap { |b| b.id = "20130304T080002" }
+      @backups = Backups.new(b2)
+      expect(@backups.count).to eq(1)
+
       b2 = Backups.new
       b2 << Backup.new.tap { |b| b.id = "20130304T080002" }
       @backups = Backups.new(b2)
