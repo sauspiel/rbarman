@@ -125,11 +125,11 @@ module RBarman
       when "KiB"
         size_b = size * 1024
       when "MiB"
-        size_b = size * 1024 * 1024
+        size_b = size * 1024 ** 2
       when "GiB"
-        size_b = size * 1024 * 1024 * 1024
+        size_b = size * 1024 ** 3
       when "TiB"
-        size_b = size * 1024 * 1024 * 1024 * 1024
+        size_b = size * 1024 ** 4 
       else
         size_b = size
       end

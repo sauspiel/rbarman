@@ -31,9 +31,9 @@ backups.count
 => 3
 
 backups.each { |b| p "id: #{b.id} }
-=> "20130304T080002"
-=> "20130225T192654"
-=> "20130218T080002"
+=> "id: 20130304T080002"
+=> "id: 20130225T192654"
+=> "id: 20130218T080002"
 
 backups.latest.id
 => "20130304T080002"
@@ -75,8 +75,8 @@ backups[0].wal_files[1022].compression
 ### Get just one backup without wal files
 
 <pre>
-backup = RBarman::Backups.by_id('server', '20130225T192654', false)
-p "id: #{backup.id}|size: #{backup.size / (1024 ** 3) }GB|wal size: #{backup.wal_file_size / (1024 ** 3)} GB"
+backup = RBarman::Backup.by_id('server', '20130225T192654', false)
+p "id: #{backup.id}|size: #{backup.size / (1024 ** 3) } GB|wal size: #{backup.wal_file_size / (1024 ** 3)} GB"
 => "id: 20130225T192654|size: 217GB|wal size: 72 GB"
 </pre>
 

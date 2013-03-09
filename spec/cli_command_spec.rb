@@ -118,23 +118,19 @@ describe CliCommand do
     end
 
     it 'should return bytes from KiB' do
-      @cmd.size_in_bytes(2048, 'KiB').should == 1024*2048
+      @cmd.size_in_bytes(2048, 'KiB').should == 2048 * 1024
     end
 
     it 'should return bytes from MiB' do
-      @cmd.size_in_bytes(2048, 'MiB').should == 1024*1024*2048
+      @cmd.size_in_bytes(2048, 'MiB').should == 2048 * 1024 ** 2
     end
 
     it 'should return bytes from GiB' do
-      @cmd.size_in_bytes(2048, 'GiB').should == 1024*1024*1024*2048
+      @cmd.size_in_bytes(2048, 'GiB').should == 2048 * 1024 ** 3    
     end
 
     it 'should return bytes from TiB' do
-      @cmd.size_in_bytes(2048, 'TiB').should == 1024*1024*1024*1024*2048
-    end
-
-    it 'should return bytes from TiB' do
-      @cmd.size_in_bytes(2048, 'TiB').should == 1024*1024*1024*1024*2048
+      @cmd.size_in_bytes(2048, 'TiB').should == 2048 * 1024 ** 4
     end
 
     it 'should return an integer' do
