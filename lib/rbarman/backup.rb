@@ -87,7 +87,7 @@ module RBarman
 
     def delete
       cmd = CliCommand.new
-      cmd.delete(@server, @backup_id)
+      cmd.delete(@server, @id)
       @deleted = true
     end
 

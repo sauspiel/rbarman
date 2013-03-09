@@ -168,8 +168,11 @@ describe Backup do
 
   describe "delete" do
     it 'should set deleted to true' do
+      @backup.server = "test"
+      @backup.id = "20130304T080002"
       File.stub!(:exists?).and_return(true)
       CliCommand.any_instance.stub(:delete)
+      CliCommand.any_instance.should_receive(:delete).once.with(@backup.server, @backup.id)
       @backup.delete
       expect(@backup.deleted).to eq(true)
     end
