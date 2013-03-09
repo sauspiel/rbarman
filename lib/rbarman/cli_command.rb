@@ -147,6 +147,10 @@ module RBarman
     private
     def run_barman_command(args)
       sh = Mixlib::ShellOut.new("#{@binary} #{args}")
+
+      # TODO timeout should be configurable
+      sh.timeout = 43200 # 12h
+
       sh.run_command
       sh.error!
       return sh.stdout.split("\n")
