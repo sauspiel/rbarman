@@ -141,7 +141,7 @@ module RBarman
     end
 
     def create(server)
-      run_barman_command("create #{server}")
+      run_barman_command("backup #{server}")
     end
 
     private
