@@ -113,8 +113,12 @@ describe CliCommand do
   end
 
   describe "size_in_bytes" do
-    it 'should raise ArgumentError if identifier is not like KiB|MiB|GiB|TiB ' do
+    it 'should raise ArgumentError if identifier is not like B|KiB|MiB|GiB|TiB ' do
       lambda { @cmd.size_in_bytes(1,"a") }.should raise_error(ArgumentError)
+    end
+
+    it 'should return bytes from B' do
+      @cmd.size_in_bytes(2048, 'B').should == 2048
     end
 
     it 'should return bytes from KiB' do

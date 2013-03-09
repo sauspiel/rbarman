@@ -119,9 +119,11 @@ module RBarman
     end
 
     def size_in_bytes(size, identifier)
-      raise(ArgumentError, "identifier not one of KiB|MiB|GiB|TiB") if !identifier.match(/(KiB|MiB|GiB|TiB)/)
+      raise(ArgumentError, "identifier not one of B|KiB|MiB|GiB|TiB") if !identifier.match(/(B|KiB|MiB|GiB|TiB)/)
       size_b = 0
       case identifier
+      when "B"
+        size_b = size
       when "KiB"
         size_b = size * 1024
       when "MiB"
@@ -130,8 +132,6 @@ module RBarman
         size_b = size * 1024 ** 3
       when "TiB"
         size_b = size * 1024 ** 4 
-      else
-        size_b = size
       end
       return size_b.to_i
     end
