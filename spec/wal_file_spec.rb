@@ -145,5 +145,4 @@ describe WalFile do
       expect(w1).to_not eq("0000000100000599000000D5")
     end
   end
-
 end
