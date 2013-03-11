@@ -1,13 +1,60 @@
 require 'time'
 
+# @author Holger Amann <holger@sauspiel.de>
 module RBarman
 
   class InvalidWalFileNameError < RuntimeError
   end
 
+  # Represents a wal file
   class WalFile
 
-    attr_reader :timeline, :xlog, :segment, :created, :compression, :size
+    # @overload timeline
+    #   @return [String, nil] timeline part of the wal file
+    # @overload timeline=
+    #   Timeline part of the wal file
+    #   @param [#to_s] timeline the timeline part
+    #   @raise [ArgumentError] if timeline length != 8
+    attr_reader :timeline 
+
+    # @overload xlog 
+    #   @return [String, nil] xlog part of the wal file
+    # @overload xlog=
+    #   xlog part of the wal file
+    #   @param [#to_s] xlog the xlog part 
+    #   @raise [ArgumentError] if xlog length != 8
+    attr_reader :xlog
+
+    # @overload segment
+    #   @return [String, nil] segment part of the wal file
+    # @overload segment=
+    #   segment part of the wal file
+    #   @param [#to_s] segment the segment part 
+    #   @raise [ArgumentError] if segment length != 8
+    attr_reader :segment
+
+    # @overload created
+    #   @return [Time, nil] time when wal file has been created
+    # @overload created=
+    #   Time when wal file has been created
+    #   @param [Time,Numeric,String] created the time
+    attr_reader :created
+
+    # @overload compression
+    #   @return [Symbol, nil] compression type of wal file, `:none`, `:gzip`, `:bzip2`, `:custom`
+    # @overload compression=
+    #   Compression type of wal file
+    #   @param [Symbol] compression compression type
+    #   @raise [ArgumentError] if compression is not one of `:none`, `:gzip`, `:bzip2`, `:custom`
+    attr_reader :compression
+
+
+    # @overload size
+    #   @return [Integer, nil] size of wal file (in bytes)
+    # @overload size=
+    #   Size of wal file (in bytes)
+    #   @param [#to_i] size size of wal file (in bytes)
+    attr_reader :size
 
     def initialize
     end
@@ -48,6 +95,11 @@ module RBarman
       @created = Time.parse(created) if created.is_a? String
     end
 
+    # Creates a new WalFile from the given argument
+    # @param [String, WalFile] name the wal file name
+    # @return [WalFile] the created WalFile
+    # @raise [InvalidWalFileNameError] if name is a string and string's length isn't exactly 24 chars or
+    #   name could not be splitted in 3 parts (timeline|xlog|segment)
     def self.parse(name)
       raise(InvalidWalFileNameError, "name has to be exactly 24 chars") if !name.is_a? WalFile and name.to_s.size != 24 
 
@@ -66,6 +118,9 @@ module RBarman
       return wal_file
     end
 
+    # Checks if other is equal to self by comparing timeline, xlog and segment
+    # @param [String, WalFile] other other wal file
+    # @return [true,false] if other is equal to self
     def ==(other)
       o = other
       o = WalFile.parse(other.to_s) if !other.is_a? WalFile
