@@ -1,6 +1,6 @@
 require 'mixlib/shellout'
 
-# @auther Holger Amann <holger@sauspiel.de>
+# @author Holger Amann <holger@sauspiel.de>
 module RBarman
 
   # Wrapper for the barman command line tool
