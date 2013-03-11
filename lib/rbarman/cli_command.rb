@@ -1,9 +1,30 @@
 require 'mixlib/shellout'
 
+# @auther Holger Amann <holger@sauspiel.de>
 module RBarman
-  class CliCommand
-    attr_reader :binary, :barman_home
 
+  # Wrapper for the barman command line tool
+  class CliCommand
+
+    # @overload binary
+    #   @return [String] path to the barman binary
+    # @overload binary=
+    #   Path to the barman binary
+    #   @param [String] path path to the binary
+    #   @raise [ArgumentError] if path doesn't exist or path doesn't end with 'barman'
+    attr_reader :binary 
+
+    # @overload barman_home
+    #   @return [String] base path where barman stores its backups
+    # @overload barman_home=
+    #   Path to the base directory of barman's backups
+    #   @param [String] path path to the base directory
+    #   @raise [ArgumentError] if path doesn't exist
+    attr_reader :barman_home
+
+    # Creates a new instance of CliCommand
+    # @param [String] path_to_binary see {#binary}. If nil, it will be initialized from {Configuration}
+    # @param [String] path_to_barman_home see {#barman_home}. If nil, it will be initialized from {Configuration}
     def initialize(path_to_binary=nil, path_to_barman_home=nil)
       self.binary=path_to_binary || Configuration.instance.binary
       self.barman_home=path_to_barman_home || Configuration.instance.barman_home
@@ -20,11 +41,22 @@ module RBarman
       @barman_home = path
     end
 
+    # Instructs barman to get information about a specific backup
+    # @param [String] server server name
+    # @param [String] backup_id id of the backup
+    # @param [true,false] with_wal_files including wal files
+    # @return [Backup] a new {Backup} object
+    # @raise [ArgumentError] if backup_id is nil
     def backup(server, backup_id, with_wal_files=true)
       raise(ArgumentError, "backup id must not be nil!") if backup_id.nil?
       return backups(server, with_wal_files, backup_id)[0]
     end
 
+    # Instructs barman to get information about backups
+    # @param [String] server server name
+    # @param [true, false] with_wal_files including wal files
+    # @param [String] backup_id when given, only information about this backup id will be retrieved
+    # @return [Backups] an array of {Backup}
     def backups(server, with_wal_files=true, backup_id=nil)
       list = run_barman_command("list-backup #{server}")
       list = list.grep(/#{backup_id}/) if !backup_id.nil?
@@ -40,6 +72,12 @@ module RBarman
       return backups
     end
 
+    # Instructs barman to list all wal files for a specific backup id
+    # @param [String] server server name
+    # @param [String] backup_id id of the backup
+    # @return [WalFiles] an array of {WalFile}
+    # @raise [RuntimeError] if wal file duplicates are found in xlog.db
+    # @raise [RuntimeError] if barman lists a wal file but no information could be found in xlog.db
     def wal_files(server, backup_id)
       lines = run_barman_command("list-files --target wal #{server} #{backup_id}")
       wal_files = parse_wal_files_list(lines)
@@ -54,6 +92,9 @@ module RBarman
       return wal_files
     end
 
+    # Creates a {WalFiles} object by parsing lines reported by barman
+    # @param [Array<String>] lines an array of lines like '/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC'
+    # @return [WalFiles] the {WalFiles}
     def parse_wal_files_list(lines)
       wal_files = Array.new
       lines.each do |line|
@@ -62,6 +103,9 @@ module RBarman
       return wal_files
     end
 
+    # Creates an array of {Backup} by parsing lines reported by barman
+    # @param [Array<String>] lines an array of lines like 'test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB'
+    # @return [Array<Backup>] an array of {Backup}
     def parse_backup_list(lines)
       result = Array.new
       lines.each do |l|
@@ -83,6 +127,12 @@ module RBarman
       return result
     end
 
+    # Assigns various values to a {Backup} by parsing the according "backup.info"
+    # @param [Backup] backup the backup
+    # @return [void]
+    # @raise [ArgumentError] if backup is not of type {Backup}
+    # @raise [ArgumentError] if backup.id is not set
+    # @raise [ArgumentError] if backup.server is not set
     def parse_backup_info_file(backup)
       raise(ArgumentError, "arg not of type Backup") if !backup.is_a? Backup
       raise(ArgumentError, "Backup.id not set") if backup.id.nil?
@@ -111,6 +161,10 @@ module RBarman
       end
     end
 
+    # Assigns size, created and compression values to a {WalFile} by parsing a line from xlog.db
+    # @param [WalFile] wal_file the wal file
+    # @param [String] line a string like '00000001000005A9000000BC\\t4684503\t1360568429.0\\tbzip2'
+    # @return [void]
     def wal_file_info_from_xlog_db_line(wal_file, line)
       splitted = line.split("\t")
       wal_file.size = splitted[1]
@@ -118,10 +172,19 @@ module RBarman
       wal_file.compression = splitted[3].downcase.to_sym
     end
 
-    def size_in_bytes(size, identifier)
-      raise(ArgumentError, "identifier not one of B|KiB|MiB|GiB|TiB") if !identifier.match(/(B|KiB|MiB|GiB|TiB)/)
+    # Converts the size according to the unit to bytes
+    # @param [Numeric] size the size
+    # @param [String] unit the unit, like `B`, `KiB`, `MiB`, `GiB` or `TiB`
+    # @return [Integer] the size in bytes
+    # @raise [ArgumentError] if unit is not one of B|KiB|MiB|GiB|TiB
+    # @example
+    #   c = CliCommand.new
+    #   c.size_in_bytes(2048, 'B') #=> 2048
+    #   c.size_in_bytes(2048, 'MiB') #=> 2048 * 1024 ** 2
+    def size_in_bytes(size, unit)
+      raise(ArgumentError, "unit not one of B|KiB|MiB|GiB|TiB") if !unit.match(/(B|KiB|MiB|GiB|TiB)/)
       size_b = 0
-      case identifier
+      case unit 
       when "B"
         size_b = size
       when "KiB"
@@ -136,10 +199,17 @@ module RBarman
       return size_b.to_i
     end
 
+    # Instructs barman to delete a specific backup
+    # @param [String] server server name
+    # @param [String] backup_id id of the backup
+    # @return [void]
     def delete(server, backup_id)
       run_barman_command("delete #{server} #{backup_id}")
     end
 
+    # Instructs barman to create a backup
+    # @param [String] server server name
+    # @return [void]
     def create(server)
       run_barman_command("backup #{server}")
     end

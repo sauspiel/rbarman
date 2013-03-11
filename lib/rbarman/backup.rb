@@ -161,6 +161,7 @@ module RBarman
 
     # Adds a wal file to the backup
     # @param [String, WalFile] wal_file the wal file
+    # @return [void]
     def add_wal_file(wal_file)
       @wal_files = WalFiles.new if @wal_files.nil?
       @wal_files << WalFile.parse(wal_file)
