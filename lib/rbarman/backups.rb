@@ -1,10 +1,10 @@
 # @author Holger Amann <holger@sauspiel.de
 module RBarman
 
-  # An array of backups
+  # An array of Backup
   class Backups < Array
 
-    # Initializes a new backup array
+    # Initializes a new Array of Backup
     # @param [Array,Backups] other appends all backups from another array
     def initialize(other=nil)
       self.concat(other) if !other.nil? and other.is_a? Array
@@ -13,7 +13,7 @@ module RBarman
     # Instructs the underlying (barman) command to get all backups for a specific server
     # @param [String] server server name
     # @param [true,false] with_wal_files including wal files
-    # @return [Backups] an array of backups
+    # @return [Backups] an array of Backup
     def self.all(server, with_wal_files=true)
       cmd = CliCommand.new
       return Backups.new(cmd.backups(server, with_wal_files))
