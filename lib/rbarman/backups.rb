@@ -12,7 +12,7 @@ module RBarman
 
     # Instructs the underlying (barman) command to get all backups for a specific server
     # @param [String] server server name
-    # @param [true,false] with_wal_files including wal files
+    # @param [Boolean] with_wal_files including wal files
     # @return [Backups] an array of Backup
     def self.all(server, with_wal_files=true)
       cmd = CliCommand.new

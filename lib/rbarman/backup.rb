@@ -97,7 +97,7 @@ module RBarman
     #   @raise [ArgumentError] if path is empty
     attr_reader :pgdata
 
-    # @return [true, false] if the backup has been deleted
+    # @return [Boolean] if the backup has been deleted
     attr_reader :deleted
 
     def initialize
@@ -167,7 +167,7 @@ module RBarman
       @wal_files << WalFile.parse(wal_file)
     end
 
-    # @return [true,false] if the wal file is already added to the backup
+    # @return [Boolean] if the wal file is already added to the backup
     # @param [String, WalFile] wal_file the wal file
     def wal_file_already_added?(wal_file)
       return false if @wal_files.nil?
@@ -175,7 +175,7 @@ module RBarman
     end
 
 
-    # @return [true, false] if id is a valid backup id
+    # @return [Boolean] if id is a valid backup id
     # @param [#to_s] id the backup id
     # @example Check if a backup id is valid
     #   Backup.backup_id_valid?("20130304T080002") #=> true
@@ -205,7 +205,7 @@ module RBarman
     # Get a specific backup
     # @param [String] server server name
     # @param [String] backup_id id of the backup
-    # @param [true,false] with_wal_files if wal files should be included
+    # @param [Boolean] with_wal_files if wal files should be included
     # @return [Backup] the backup
     def self.by_id(server, backup_id, with_wal_files=true)
       cmd = CliCommand.new

@@ -120,7 +120,7 @@ module RBarman
 
     # Checks if other is equal to self by comparing timeline, xlog and segment
     # @param [String, WalFile] other other wal file
-    # @return [true,false] if other is equal to self
+    # @return [Boolean] if other is equal to self
     def ==(other)
       o = other
       o = WalFile.parse(other.to_s) if !other.is_a? WalFile

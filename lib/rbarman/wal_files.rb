@@ -1,4 +1,4 @@
-# @auther Holger Amann <holger@sauspiel.de>
+# @author Holger Amann <holger@sauspiel.de>
 module RBarman
 
   # An Array of WalFile

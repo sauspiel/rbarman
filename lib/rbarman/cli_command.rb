@@ -44,7 +44,7 @@ module RBarman
     # Instructs barman to get information about a specific backup
     # @param [String] server server name
     # @param [String] backup_id id of the backup
-    # @param [true,false] with_wal_files including wal files
+    # @param [Boolean] with_wal_files including wal files
     # @return [Backup] a new {Backup} object
     # @raise [ArgumentError] if backup_id is nil
     def backup(server, backup_id, with_wal_files=true)
@@ -54,7 +54,7 @@ module RBarman
 
     # Instructs barman to get information about backups
     # @param [String] server server name
-    # @param [true, false] with_wal_files including wal files
+    # @param [Boolean] with_wal_files including wal files
     # @param [String] backup_id when given, only information about this backup id will be retrieved
     # @return [Backups] an array of {Backup}
     def backups(server, with_wal_files=true, backup_id=nil)
