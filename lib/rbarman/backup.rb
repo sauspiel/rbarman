@@ -6,6 +6,8 @@ module RBarman
   class InvalidBackupIdError < RuntimeError
   end
 
+
+  # Represents a barman Backup
   class Backup
 
     # @return [String, nil] name of the server to which the backup belongs. 
@@ -98,7 +100,6 @@ module RBarman
     # @return [true, false] if the backup has been deleted
     attr_reader :deleted
 
-    # Represents a Backup
     def initialize
       @deleted = false
     end
