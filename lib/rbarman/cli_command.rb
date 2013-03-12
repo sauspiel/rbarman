@@ -101,9 +101,9 @@ module RBarman
     end
 
 
-    # Creates a {Server} object by parsing lines reported by barman
+    # Creates a {Server} object by parsing lines reported by barman's `show-server`
     # @param [String] server name of the server
-    # @param [Array<String>] lines an array of lines from output of barman `show-server` cmd
+    # @param [Array<String>] lines an array of lines from output of barman's `show-server` cmd
     # @return [Server] a new {Server} object
     def parse_show_server_lines(server, lines)
       s = Server.new(server)
@@ -125,6 +125,23 @@ module RBarman
         end
       end
       return s
+    end
+
+    # Parses lines reported by barman's `check` and assigns according values
+    # @param [Server] server the server
+    # @param [Array<String>] lines an array of lines from output of barman's `check` cmd
+    # @raise [ArgumentError] if server is nil
+    def parse_check_lines(server, lines)
+      raise(ArgumentError, 'arg server not of type Server') if !server.is_a? Server
+      lines.each do |l|
+        key, value = l.gsub("\t","").split(": ")
+        case key.chomp
+        when "ssh"
+          server.ssh_check_ok = value == "OK" ? true : false
+        when "PostgreSQL"
+          server.pg_conn_ok = value == "OK" ? true : false
+        end
+      end
     end
 
     # Creates a {WalFiles} object by parsing lines reported by barman

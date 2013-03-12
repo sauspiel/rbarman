@@ -379,9 +379,6 @@ describe CliCommand do
         "\tident_file: /etc/postgresql/9.2/main/pg_ident.conf"
       ]
 
-      @cmd.stub!(:binary=)
-      @cmd.stub!(:barman_home=)
-
       s = @cmd.parse_show_server_lines("test", lines)
       expect(s.name).to eq("test")
       expect(s.active).to eq(true)
@@ -392,4 +389,31 @@ describe CliCommand do
       expect(s.wals_dir).to eq("/var/lib/barman/test/wals")
     end
   end
+
+  describe "parse_check_lines" do
+    it 'should raise ArgumentError if server is nil' do
+      expect {@cmd.parse_check_lines(nil, [])}.to raise_error(ArgumentError)
+    end
+
+    it 'should assign parsed values to a server object' do
+      s = Server.new('test')
+
+      lines = [
+        "Server test:", 
+        "\tssh: OK", 
+        "\tPostgreSQL: OK", 
+        "\tarchive_mode: OK", 
+        "\tarchive_command: OK", 
+        "\tdirectories: OK", 
+        "\tretention policy settings: OK", 
+        "\tcompression settings: OK", 
+        "\tminimum redundancy requirements: OK (have 4 backups, expected at least 0)"
+      ]
+
+      @cmd.parse_check_lines(s, lines)
+      expect(s.ssh_check_ok).to eq(true)
+      expect(s.pg_conn_ok).to eq(true)
+    end
+  end
+
 end
