@@ -78,12 +78,17 @@ module RBarman
 
     # Instructs barman to get information about a server
     # @param [String] name name of the server
+    # @param [Hash] opts options for creating {Server}
+    # @option opts [Boolean] :with_backups whether to inlude {Backups} in {Server}
+    # @option opts [Boolean] :with_wal_files whether to include {WalFiles} in each {Backup}
     # @return [Server] a new {Server}
-    def server(name)
+    def server(name, opts = {})
       lines = run_barman_command("show-server #{name}")
       server = parse_show_server_lines(name, lines)
       lines = run_barman_command("check #{name}")
       parse_check_lines(server, lines)
+
+      server.backups = backups(server.name, opts) if opts[:with_backups]
       return server
     end
 
