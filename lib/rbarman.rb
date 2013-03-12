@@ -1,3 +1,4 @@
+require "rbarman/string"
 require "rbarman/version"
 require "rbarman/backup"
 require "rbarman/backups"
