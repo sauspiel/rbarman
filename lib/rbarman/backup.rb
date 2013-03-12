@@ -198,18 +198,19 @@ module RBarman
     def self.create(server)
       cmd = CliCommand.new
       cmd.create(server)
-      backups = Backups.all(server, false)
-      return Backup.by_id(server, backups.latest.id, true)
+      backups = Backups.all(server, { :with_wal_files => false })
+      return Backup.by_id(server, backups.latest.id, { :with_wal_files => true })
     end
 
     # Get a specific backup
     # @param [String] server server name
     # @param [String] backup_id id of the backup
-    # @param [Boolean] with_wal_files if wal files should be included
+    # @param [Hash] opts options for creating a {Backup}
+    # @option opts [Boolean] :with_wal_files whether to include {WalFiles} in {Backup}
     # @return [Backup] the backup
-    def self.by_id(server, backup_id, with_wal_files=true)
+    def self.by_id(server, backup_id, opts = {})
       cmd = CliCommand.new
-      return cmd.backup(server, backup_id, with_wal_files)
+      return cmd.backup(server, backup_id, opts)
     end
   end
 end

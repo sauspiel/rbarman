@@ -12,11 +12,12 @@ module RBarman
 
     # Instructs the underlying (barman) command to get all backups for a specific server
     # @param [String] server server name
-    # @param [Boolean] with_wal_files including wal files
+    # @param [Hash] opts options for creating {Backups}
+    # @option opts [Boolean] :with_wal_files whether to include {WalFiles}
     # @return [Backups] an array of Backup
-    def self.all(server, with_wal_files=true)
+    def self.all(server, opts={})
       cmd = CliCommand.new
-      return Backups.new(cmd.backups(server, with_wal_files))
+      return Backups.new(cmd.backups(server, nil, opts))
     end
 
     # Get the latest (newest) backup of all backups in the array
