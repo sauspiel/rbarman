@@ -26,7 +26,7 @@ Or install it yourself as:
 This will call pgbarman and some other sources (backup.info, xlog.db) to get information about your backups and could take several minutes (and  memory) if you have many backups with thousand of wal files. 
 
 <pre>
-backups = RBarman::Backups.all('server', { :with_wal_files = true })
+backups = RBarman::Backups.all('server', { :with_wal_files => true })
 backups.count
 => 3
 
@@ -95,7 +95,7 @@ p b.id
 This tells pgbarman to delete the specified backup
 
 <pre>
-backup = RBarman::Backup.by_id('server', '20130225T192654', false)
+backup = RBarman::Backup.by_id('server', '20130225T192654', { :with_wal_files => false })
 p backup.deleted
 => false
 backup.delete
