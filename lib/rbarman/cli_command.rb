@@ -79,7 +79,7 @@ module RBarman
     # Instructs barman to get information about a server
     # @param [String] name name of the server
     # @param [Hash] opts options for creating {Server}
-    # @option opts [Boolean] :with_backups whether to inlude {Backups} in {Server}
+    # @option opts [Boolean] :with_backups whether to include {Backups} in {Server}
     # @option opts [Boolean] :with_wal_files whether to include {WalFiles} in each {Backup}
     # @return [Server] a new {Server}
     def server(name, opts = {})
@@ -87,9 +87,23 @@ module RBarman
       server = parse_show_server_lines(name, lines)
       lines = run_barman_command("check #{name}")
       parse_check_lines(server, lines)
-
       server.backups = backups(server.name, opts) if opts[:with_backups]
       return server
+    end
+
+    # Instructs barman to get information about all servers
+    # @param [Hash] opts options for creating {Servers}
+    # @option opts [Boolean] :with_backups whether to include {Backups}
+    # @option opts [Boolean] :with_wal_files whether to include {WalFiles}
+    # @return [Servers] an array of {Server}
+    def servers(opts = {})
+      result = Servers.new
+      lines = run_barman_command("list-server")
+      server_names = parse_list_server_lines(lines)
+      server_names.each do |name|
+        result << server(name, opts)
+      end
+      return result
     end
 
     # Instructs barman to list all wal files for a specific backup id
@@ -110,6 +124,18 @@ module RBarman
         wal_file_info_from_xlog_db_line(w, lines[0])
       end
       return wal_files
+    end
+
+
+    # Parses lines reported by barman's `list-server`
+    # @param [Array<String>] lines an array of lines from output of barman's `list-server` cmd
+    # @return [Array<String>] an array of server names
+    def parse_list_server_lines(lines)
+      result = Array.new
+      lines.each do |l|
+        result << l.split("-")[0].strip
+      end
+      return result
     end
 
 

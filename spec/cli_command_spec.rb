@@ -447,4 +447,17 @@ describe CliCommand do
     end
   end
 
+  describe "parse_list_server_lines" do
+    it 'should return server names' do
+      lines = [
+        "testdb1 - description for testdb1", 
+        "testdb2 - description for testdb2"
+      ]
+      names = @cmd.parse_list_server_lines(lines)
+      expect(names.count).to eq(2)
+      expect(names[0]).to eq("testdb1")
+      expect(names[1]).to eq("testdb2")
+    end
+  end
+
 end
