@@ -1,10 +1,10 @@
 # @author Holger Amann <holger@sauspiel.de
 module RBarman
 
-  # An array of Backup
+  # An array of {Backup}
   class Backups < Array
 
-    # Initializes a new Array of Backup
+    # Initializes a new Array of {Backup}
     # @param [Array,Backups] other appends all backups from another array
     def initialize(other=nil)
       self.concat(other) if !other.nil? and other.is_a? Array
@@ -14,20 +14,20 @@ module RBarman
     # @param [String] server server name
     # @param [Hash] opts options for creating {Backups}
     # @option opts [Boolean] :with_wal_files whether to include {WalFiles}
-    # @return [Backups] an array of Backup
+    # @return [Backups] an array of {Backup}
     def self.all(server, opts={})
       cmd = CliCommand.new
       return Backups.new(cmd.backups(server, opts))
     end
 
     # Get the latest (newest) backup of all backups in the array
-    # @return [Backup] the latest backup
+    # @return [Backup] the latest {Backup}
     def latest
       self.sort_by { |d| Time.parse(d.id) }.reverse.first
     end
 
     # Get the oldest backup of all backups in the array
-    # @return [Backup] the oldest backup
+    # @return [Backup] the oldest {Backup}
     def oldest
       self.sort_by { |d| Time.parse(d.id) }.first
     end

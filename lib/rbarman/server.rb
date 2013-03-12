@@ -60,6 +60,24 @@ module RBarman
       cmd = CliCommand.new
       return cmd.server(name, opts)
     end
+  end
 
+  # An array of {Server}
+  class Servers < Array
+    # Initializes a new Array of {Server}
+    # @param [Array, Servers] other appends all servers from another array
+    def initialize(other=nil)
+      self.concat(other) if !other.nil? and other.is_a? Array
+    end
+
+    # Instructs the underlying (barman) command to get all servers
+    # @param [Hash] opts options for creating {Servers}
+    # @option opts [Boolean] :with_backups whether to include {Backups}
+    # @option opts [Boolean] :with_wal_files whether to include {WalFiles}
+    # @return [Servers] an array of {Server}
+    def self.all(opts={})
+      cmd = CliCommand.new
+      return Servers.new(cmd.servers(opts))
+    end
   end
 end
