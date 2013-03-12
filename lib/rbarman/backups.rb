@@ -17,7 +17,7 @@ module RBarman
     # @return [Backups] an array of Backup
     def self.all(server, opts={})
       cmd = CliCommand.new
-      return Backups.new(cmd.backups(server, nil, opts))
+      return Backups.new(cmd.backups(server, opts))
     end
 
     # Get the latest (newest) backup of all backups in the array

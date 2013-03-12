@@ -50,7 +50,8 @@ module RBarman
     # @raise [ArgumentError] if backup_id is nil
     def backup(server, backup_id, opts = {})
       raise(ArgumentError, "backup id must not be nil!") if backup_id.nil?
-      return backups(server, backup_id, opts)[0]
+      opts[:backup_id] = backup_id
+      return backups(server, opts)[0]
     end
 
     # Instructs barman to get information about backups
@@ -58,10 +59,11 @@ module RBarman
     # @param [String] backup_id when given, only information about this backup id will be retrieved
     # @param [Hash] opts options for creating {Backups}
     # @option opts [Boolean] :with_wal_files whether to include {WalFiles} in each {Backup}
+    # @option opts [String] :backup_id retrieve just one {Backup} specified by this backup id
     # @return [Backups] an array of {Backup}
-    def backups(server, backup_id=nil, opts = {})
+    def backups(server, opts = {})
       list = run_barman_command("list-backup #{server}")
-      list = list.grep(/#{backup_id}/) if !backup_id.nil?
+      list = list.grep(/#{opts[:backup_id]}/) if !opts[:backup_id].nil?
 
       backups = parse_backup_list(list)
       backups.each do |backup|

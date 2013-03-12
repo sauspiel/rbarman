@@ -174,7 +174,7 @@ describe CliCommand do
 
       @cmd.stub!(:run_barman_command).and_return(backup_list, wal_files)
       @cmd.stub!(:file_content).and_return(backup_info_lines, xlog_db_lines)
-      backups = @cmd.backups("test", nil, { :with_wal_files => true })
+      backups = @cmd.backups("test", { :with_wal_files => true })
       expect(backups.count).to eq(1)
       expect(backups[0].id).to eq("20130218T080002")
       expect(backups[0].size).to eq(233655051378)
