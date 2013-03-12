@@ -23,10 +23,10 @@ Or install it yourself as:
 
 ### Get all your backups!
 
-This will call pgbarman and some other sources (backup.info, xlog.db) to get information about your backups. This could take several minutes (and  memory) if you have many backups with thousand of wal files. If you don't want to scan for wal file information, use RBarman::Backups.all('server', false)
+This will call pgbarman and some other sources (backup.info, xlog.db) to get information about your backups and could take several minutes (and  memory) if you have many backups with thousand of wal files. 
 
 <pre>
-backups = RBarman::Backups.all('server', true)
+backups = RBarman::Backups.all('server', { :with_wal_files = true })
 backups.count
 => 3
 
@@ -75,7 +75,7 @@ backups[0].wal_files[1022].compression
 ### Get just one backup without wal files
 
 <pre>
-backup = RBarman::Backup.by_id('server', '20130225T192654', false)
+backup = RBarman::Backup.by_id('server', '20130225T192654')
 p "id: #{backup.id}|size: #{backup.size / (1024 ** 3) } GB|wal size: #{backup.wal_file_size / (1024 ** 3)} GB"
 => "id: 20130225T192654|size: 217GB|wal size: 72 GB"
 </pre>
