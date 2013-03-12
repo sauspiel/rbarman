@@ -77,7 +77,10 @@ module RBarman
     # @return [Server] a new {Server}
     def server(name)
       lines = run_barman_command("show-server #{name}")
-      return parse_show_server_lines(name, lines)
+      server = parse_show_server_lines(name, lines)
+      lines = run_barman_command("check #{name}")
+      parse_check_lines(server, lines)
+      return server
     end
 
     # Instructs barman to list all wal files for a specific backup id

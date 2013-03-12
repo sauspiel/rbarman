@@ -416,4 +416,17 @@ describe CliCommand do
     end
   end
 
+  describe "server" do
+    it 'should create a valid server object' do
+      show_lines = ["\tactive: true"]
+      check_lines = ["\tssh: OK"]
+      @cmd.stub!(:run_barman_command).and_return(show_lines, check_lines)
+      server = @cmd.server("test123")
+
+      expect(server.name).to eq("test123")
+      expect(server.active).to eq(true)
+      expect(server.ssh_check_ok).to eq(true)
+    end
+  end
+
 end
