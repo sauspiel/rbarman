@@ -72,13 +72,13 @@ describe CliCommand do
       backups = @cmd.parse_backup_list(lines)
       backups[0].id.should == "20130225T192654"
       backups[0].server.should == "test"
-      backups[0].size.should == @cmd.size_in_bytes(217.0, "GiB")
-      backups[0].wal_file_size.should == @cmd.size_in_bytes(72.0, "GiB")
+      backups[0].size.should == CliCommand.size_in_bytes(217.0, "GiB")
+      backups[0].wal_file_size.should == CliCommand.size_in_bytes(72.0, "GiB")
 
       backups[1].id.should == "20130218T080002"
       backups[1].server.should == "test"
-      backups[1].size.should == @cmd.size_in_bytes(213.0, "GiB")
-      backups[1].wal_file_size.should == @cmd.size_in_bytes(130.0, "GiB")
+      backups[1].size.should == CliCommand.size_in_bytes(213.0, "GiB")
+      backups[1].wal_file_size.should == CliCommand.size_in_bytes(130.0, "GiB")
     end
 
     it 'should detect a started or failed backup' do
@@ -97,8 +97,8 @@ describe CliCommand do
 
       backups[1].id.should == "20130218T080002"
       backups[1].server.should == "test"
-      backups[1].size.should == @cmd.size_in_bytes(213.0, "GiB")
-      backups[1].wal_file_size.should == @cmd.size_in_bytes(130.0, "GiB")
+      backups[1].size.should == CliCommand.size_in_bytes(213.0, "GiB")
+      backups[1].wal_file_size.should == CliCommand.size_in_bytes(130.0, "GiB")
       backups[1].status.should == :done
 
       backups[2].id.should == "20130218T080013"
@@ -112,33 +112,33 @@ describe CliCommand do
     end
   end
 
-  describe "size_in_bytes" do
+  describe ".size_in_bytes" do
     it 'should raise ArgumentError if identifier is not like B|KiB|MiB|GiB|TiB ' do
-      lambda { @cmd.size_in_bytes(1,"a") }.should raise_error(ArgumentError)
+      lambda { CliCommand.size_in_bytes(1,"a") }.should raise_error(ArgumentError)
     end
 
     it 'should return bytes from B' do
-      @cmd.size_in_bytes(2048, 'B').should == 2048
+      CliCommand.size_in_bytes(2048, 'B').should == 2048
     end
 
     it 'should return bytes from KiB' do
-      @cmd.size_in_bytes(2048, 'KiB').should == 2048 * 1024
+      CliCommand.size_in_bytes(2048, 'KiB').should == 2048 * 1024
     end
 
     it 'should return bytes from MiB' do
-      @cmd.size_in_bytes(2048, 'MiB').should == 2048 * 1024 ** 2
+      CliCommand.size_in_bytes(2048, 'MiB').should == 2048 * 1024 ** 2
     end
 
     it 'should return bytes from GiB' do
-      @cmd.size_in_bytes(2048, 'GiB').should == 2048 * 1024 ** 3    
+      CliCommand.size_in_bytes(2048, 'GiB').should == 2048 * 1024 ** 3    
     end
 
     it 'should return bytes from TiB' do
-      @cmd.size_in_bytes(2048, 'TiB').should == 2048 * 1024 ** 4
+      CliCommand.size_in_bytes(2048, 'TiB').should == 2048 * 1024 ** 4
     end
 
     it 'should return an integer' do
-      @cmd.size_in_bytes(2048.0, 'KiB').should be_a_kind_of(Integer)
+      CliCommand.size_in_bytes(2048.0, 'KiB').should be_a_kind_of(Integer)
     end
   end
 
@@ -179,7 +179,7 @@ describe CliCommand do
       expect(backups[0].id).to eq("20130218T080002")
       expect(backups[0].size).to eq(233655051378)
       expect(backups[0].status).to eq(:done)
-      expect(backups[0].wal_file_size).to eq(@cmd.size_in_bytes(130.0, "GiB"))
+      expect(backups[0].wal_file_size).to eq(CliCommand.size_in_bytes(130.0, "GiB"))
       expect(backups[0].wal_files.count).to eq(2)
     end
 

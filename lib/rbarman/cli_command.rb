@@ -178,8 +178,8 @@ module RBarman
         
         if b.status == :done
           sizematch = l.match(/.+Size:\s(.+)\s(.+)\s-.+Size:\s(.+)\s(.+)/)
-          b.size = size_in_bytes(sizematch[1].to_f, sizematch[2])
-          b.wal_file_size = size_in_bytes(sizematch[3].to_f, sizematch[4])
+          b.size = CliCommand.size_in_bytes(sizematch[1].to_f, sizematch[2])
+          b.wal_file_size = CliCommand.size_in_bytes(sizematch[3].to_f, sizematch[4])
         end
         result << b
       end
@@ -237,10 +237,9 @@ module RBarman
     # @return [Integer] the size in bytes
     # @raise [ArgumentError] if unit is not one of B|KiB|MiB|GiB|TiB
     # @example
-    #   c = CliCommand.new
-    #   c.size_in_bytes(2048, 'B') #=> 2048
-    #   c.size_in_bytes(2048, 'MiB') #=> 2048 * 1024 ** 2
-    def size_in_bytes(size, unit)
+    #   CliCommand.size_in_bytes(2048, 'B') #=> 2048
+    #   CliCommand.size_in_bytes(2048, 'MiB') #=> 2048 * 1024 ** 2
+    def self.size_in_bytes(size, unit)
       raise(ArgumentError, "unit not one of B|KiB|MiB|GiB|TiB") if !unit.match(/(B|KiB|MiB|GiB|TiB)/)
       size_b = 0
       case unit 
