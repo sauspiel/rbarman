@@ -56,6 +56,7 @@ module RBarman
     #   @param [#to_i] size size of wal file (in bytes)
     attr_reader :size
 
+    # Creates a new instance of {WalFile}
     def initialize
     end
 
