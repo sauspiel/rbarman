@@ -72,6 +72,14 @@ module RBarman
       return backups
     end
 
+    # Instructs barman to get information about a server
+    # @param [String] name name of the server
+    # @return [Server] a new {Server}
+    def server(name)
+      lines = run_barman_command("show-server #{name}")
+      return parse_show_server_lines(name, lines)
+    end
+
     # Instructs barman to list all wal files for a specific backup id
     # @param [String] server server name
     # @param [String] backup_id id of the backup
@@ -90,6 +98,33 @@ module RBarman
         wal_file_info_from_xlog_db_line(w, lines[0])
       end
       return wal_files
+    end
+
+
+    # Creates a {Server} object by parsing lines reported by barman
+    # @param [String] server name of the server
+    # @param [Array<String>] lines an array of lines from output of barman `show-server` cmd
+    # @return [Server] a new {Server} object
+    def parse_show_server_lines(server, lines)
+      s = Server.new(server)
+      lines.each do |l|
+        key, value = l.gsub("\t","").split(": ")
+        case key.chomp
+        when "active"
+          s.active = value.to_bool
+        when "ssh_command"
+          s.ssh_cmd = value
+        when "conninfo"
+          s.conn_info = value
+        when "backup_directory"
+          s.backup_dir = value
+        when "basebackups_directory"
+          s.base_backups_dir = value
+        when "wals_directory"
+          s.wals_dir = value
+        end
+      end
+      return s
     end
 
     # Creates a {WalFiles} object by parsing lines reported by barman

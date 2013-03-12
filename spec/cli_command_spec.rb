@@ -334,10 +334,6 @@ describe CliCommand do
 
       expect { @cmd.wal_files("test", "123") }.to raise_error(RuntimeError)
     end
-
-
-
-
   end
 
   describe "wal_file_info_from_xlog_db_line" do
@@ -348,6 +344,52 @@ describe CliCommand do
       expect(w.size).to eq(4684503)
       expect(w.created).to eq(Time.at(1360568429))
       expect(w.compression).to eq("bzip2".to_sym)
+    end
+  end
+
+  describe "parse_show_server_lines" do
+    it 'should create a valid Server object' do
+      lines = [
+        "Server test:", 
+        "\tactive: true", 
+        "\tdescription: PostgreSQL Master Server @ db.testdomain.com", 
+        "\tssh_command: ssh postgres@27.118.19.4", 
+        "\tconninfo: host=127.0.0.1 user=postgres port=25432", 
+        "\tbackup_directory: /var/lib/barman/test", 
+        "\tbasebackups_directory: /var/lib/barman/test/base", 
+        "\twals_directory: /var/lib/barman/test/wals", 
+        "\tincoming_wals_directory: /var/lib/barman/test/incoming", 
+        "\tlock_file: /var/lib/barman/test/test.lock", 
+        "\tcompression: bzip2", "\tcustom_compression_filter: None", 
+        "\tcustom_decompression_filter: None", 
+        "\tretention_policy_mode: auto", 
+        "\tretention_policy: None", 
+        "\twal_retention_policy: main", 
+        "\tpre_backup_script: None", 
+        "\tpost_backup_script: None", 
+        "\tminimum_redundancy: 0", 
+        "\tcurrent_xlog: 00000001000005D800000096", 
+        "\tlast_shipped_wal: 00000001000005D800000095", 
+        "\tarchive_command: /var/lib/postgresql/9.2/main/archive_command.sh %p %f", 
+        "\tserver_txt_version: 9.2.3", 
+        "\tdata_directory: /var/lib/postgresql/9.2/main", 
+        "\tarchive_mode: on", 
+        "\tconfig_file: /etc/postgresql/9.2/main/postgresql.conf", 
+        "\thba_file: /etc/postgresql/9.2/main/pg_hba.conf", 
+        "\tident_file: /etc/postgresql/9.2/main/pg_ident.conf"
+      ]
+
+      @cmd.stub!(:binary=)
+      @cmd.stub!(:barman_home=)
+
+      s = @cmd.parse_show_server_lines("test", lines)
+      expect(s.name).to eq("test")
+      expect(s.active).to eq(true)
+      expect(s.ssh_cmd).to eq("ssh postgres@27.118.19.4")
+      expect(s.conn_info).to eq("host=127.0.0.1 user=postgres port=25432")
+      expect(s.backup_dir).to eq("/var/lib/barman/test")
+      expect(s.base_backups_dir).to eq("/var/lib/barman/test/base")
+      expect(s.wals_dir).to eq("/var/lib/barman/test/wals")
     end
   end
 end
