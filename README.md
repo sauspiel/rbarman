@@ -1,10 +1,10 @@
 # rbarman
 
-rbarman - Ruby Wrapper for 2ndQuadrant's PostgreSQL backup tool [pgbarman](http://pgbarman.org)
+rbarman - Ruby Wrapper for 2ndQuadrant's PostgreSQL backup tool [barman](http://pgbarman.org)
 
 ## Installation
 
-pgbarman has to be installed and configured on the same host where this gem is to be used, otherwise it cannot get any useful information about your backups ;)
+barman has to be installed and configured on the same host where this gem is to be used, otherwise it cannot get any useful information about your backups ;)
 
 
 Add this line to your application's Gemfile:
@@ -21,20 +21,32 @@ Or install it yourself as:
 
 ## Usage
 
+Just a few examples..
+
 ### Get all your backups!
 
-This will call pgbarman and some other sources (backup.info, xlog.db) to get information about your backups and could take several minutes (and  memory) if you have many backups with thousand of wal files. 
+This will call various barman commands and some other sources (backup.info, xlog.db) to get information about your backups and could take several minutes (and  memory) if you have many backups with thousand of wal files. 
 
 <pre>
-backups = RBarman::Backups.all('server', { :with_wal_files => true })
-backups.count
+servers = RBarman::Servers.all({:with_backups => true, :with_wal_files => true })
+servers.count
 => 3
 
-backups.each { |b| p "id: #{b.id} }
+servers[0].name
+=> "pgmaster"
+
+servers[0].ssh_cmd
+=> "ssh postgres@10.118.19.4"
+
+servers[0].backups.count
+=> 2
+
+servers[0].backups.each { |b| p "id: #{b.id} }
 => "id: 20130304T080002"
 => "id: 20130225T192654"
 => "id: 20130218T080002"
 
+backups = servers[0].backups
 backups.latest.id
 => "20130304T080002"
 
@@ -75,7 +87,7 @@ backups[0].wal_files[1022].compression
 ### Get just one backup without wal files
 
 <pre>
-backup = RBarman::Backup.by_id('server', '20130225T192654')
+backup = RBarman::Backup.by_id('pg_master', '20130225T192654')
 p "id: #{backup.id}|size: #{backup.size / (1024 ** 3) } GB|wal size: #{backup.wal_file_size / (1024 ** 3)} GB"
 => "id: 20130225T192654|size: 217GB|wal size: 72 GB"
 </pre>
