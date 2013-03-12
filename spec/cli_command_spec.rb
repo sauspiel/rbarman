@@ -418,14 +418,32 @@ describe CliCommand do
 
   describe "server" do
     it 'should create a valid server object' do
+
+      backup_list = [
+        "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB",
+      ]
+
+      backup_info_lines = [
+        "begin_time=2013-02-25 19:26:54.852814",
+        "end_time=2013-02-26 05:50:05.523594",
+        "status=DONE",
+        "size=233655051378",
+        "pgdata=/var/lib/postgresql/9.2/main",
+        "timeline=1",
+        "begin_wal=0000000100000552000000B6",
+        "end_wal=000000010000055700000031"
+      ]
+
       show_lines = ["\tactive: true"]
       check_lines = ["\tssh: OK"]
-      @cmd.stub!(:run_barman_command).and_return(show_lines, check_lines)
-      server = @cmd.server("test123")
-
+      @cmd.stub!(:run_barman_command).and_return(show_lines, check_lines, backup_list)
+      @cmd.stub!(:file_content).and_return(backup_info_lines)
+      server = @cmd.server("test123", { :with_backups => true })
       expect(server.name).to eq("test123")
       expect(server.active).to eq(true)
       expect(server.ssh_check_ok).to eq(true)
+      expect(server.backups.count).to eq(1)
+      expect(server.backups[0].size).to eq(233655051378)
     end
   end
 
