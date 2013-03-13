@@ -104,7 +104,7 @@ p b.id
 
 ### Delete a backup
 
-This tells pgbarman to delete the specified backup
+This instructs barman to delete the specified backup
 
 <pre>
 backup = RBarman::Backup.by_id('server', '20130225T192654', { :with_wal_files => false })
