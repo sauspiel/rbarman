@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Usage
 
-Just a few examples..
+Just a few examples. Please read the [documentation](https://rubygems.org/gems/rbarman) for more details.
 
 ### Get all your backups!
 
@@ -115,10 +115,13 @@ p backup.deleted
 => true
 </pre>
 
-### Not yet implemented
+### Recover a backup
 
-* restore backups
+Recovers newest/latest backup to the specified path on the remote host
 
+<pre>
+RBarman::Backups.all('testdb').latest.recover('/var/lib/postgresql/9.2/main', { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
+</pre>
 
 ## Contributing
 
@@ -133,5 +136,5 @@ p backup.deleted
 
 Written by [Holger Amann](http://github.com/hamann), sponsored by [Sauspiel GmbH](https://www.sauspiel.de)
 
-Release under the MIT License: http://www.opensource.org/licenses/mit-license.php
+Release under the [MIT License](http://www.opensource.org/licenses/mit-license.php)
 

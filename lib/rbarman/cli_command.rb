@@ -56,7 +56,6 @@ module RBarman
 
     # Instructs barman to get information about backups
     # @param [String] server server name
-    # @param [String] backup_id when given, only information about this backup id will be retrieved
     # @param [Hash] opts options for creating {Backups}
     # @option opts [Boolean] :with_wal_files whether to include {WalFiles} in each {Backup}
     # @option opts [String] :backup_id retrieve just one {Backup} specified by this backup id
@@ -301,6 +300,42 @@ module RBarman
     # @return [void]
     def create(server)
       run_barman_command("backup #{server}")
+    end
+
+    # Instructs barman to recover a backup
+    # @param [String] server the server which includes the backup
+    # @param [String] backup_id the id of the backup
+    # @param [String] path the path to which the backup should be restored
+    # @param [Hash] opts options passed as arguments to barman recover cmd
+    # @option opts [String] :remote_ssh_cmd the ssh command to be used for remote recovery
+    # @option opts [String, Time] :target_time the timestamp as recovery target
+    # @option opts [String] :target_xid the transaction ID as recovery target
+    # @option opts [Boolean] :exclusive whether to stop immediately before or after the recovery target
+    # @note when :remote_ssh_cmd is passed in options, 'path' is the path on the remote host, otherwise local
+    # @return [void]
+    # @since 0.0.3
+    # @example
+    #   clicommand.recover('test2', '20130218T080002', '/var/lib/postgresql/9.2/main', { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
+    def recover(server, backup_id, path, opts={})
+      args = create_recovery_cmd_args(opts)
+      run_barman_command("barman recover #{args} #{server} #{backup_id} #{path}")
+    end
+
+    # Creates an argument string for barman recovery command based on opts Hash
+    # @param [Hash] opts options for creating the arguments
+    # @option opts [String] :remote_ssh_cmd the ssh command to be used for remote recovery
+    # @option opts [String, Time] :target_time the timestamp as recovery target
+    # @option opts [String] :target_xid the transaction ID as recovery target
+    # @option opts [Boolean] :exclusive whether to stop immediately before or immediately after the recovery target
+    # @return [String] the arguments
+    # @since 0.0.3
+    def create_recovery_cmd_args(opts={})
+      args = Array.new
+      args << "--remote-ssh-command='#{opts[:remote_ssh_cmd]}'" if opts[:remote_ssh_cmd]
+      args << "--target-time '#{opts[:target_time].to_s}'" if opts[:target_time]
+      args << "--target-xid #{opts[:target_xid]}" if opts[:target_xid]
+      args << "--exclusive" if opts[:exclusive]
+      return args.join(" ")
     end
 
     private

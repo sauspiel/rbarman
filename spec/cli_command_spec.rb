@@ -460,4 +460,22 @@ describe CliCommand do
     end
   end
 
+  describe "create_recovery_cmd_args" do
+    it 'should return an arguments string' do
+      t = Time.now
+      h = Hash.new
+      h[:remote_ssh_cmd] = '123'
+      h[:exclusive] = true
+      h[:target_time] = t
+      h[:target_xid] = 1
+
+      args = @cmd.create_recovery_cmd_args(h)
+      expect(args).to eq("--remote-ssh-command='123' --target-time '#{t.to_s}' --target-xid 1 --exclusive")
+
+      h = Hash.new
+      args = @cmd.create_recovery_cmd_args(h)
+      expect(args).to eq("")
+    end
+  end
+
 end
