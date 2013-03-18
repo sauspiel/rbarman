@@ -120,7 +120,8 @@ p backup.deleted
 Recovers newest/latest backup to the specified path on the remote host
 
 <pre>
-RBarman::Backups.all('testdb').latest.recover('/var/lib/postgresql/9.2/main', { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
+RBarman::Backups.all('testdb').latest.recover('/var/lib/postgresql/9.2/main', 
+    { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
 </pre>
 
 ## Contributing
