@@ -145,7 +145,7 @@ describe CliCommand do
   describe "backups" do
     it 'should return an empty array if there are no backups' do
       @cmd.stub!(:run_barman_command).and_return([])
-      @cmd.backups("test").should be_an_instance_of Array
+      @cmd.backups("test").should be_an_instance_of Backups
     end
 
     it 'should return an array of backup if there are backups' do
@@ -175,6 +175,7 @@ describe CliCommand do
       @cmd.stub!(:run_barman_command).and_return(backup_list, wal_files)
       @cmd.stub!(:file_content).and_return(backup_info_lines, xlog_db_lines)
       backups = @cmd.backups("test", { :with_wal_files => true })
+      expect(backups).to be_an_instance_of Backups
       expect(backups.count).to eq(1)
       expect(backups[0].id).to eq("20130218T080002")
       expect(backups[0].size).to eq(233655051378)

@@ -64,7 +64,7 @@ module RBarman
       list = run_barman_command("list-backup #{server}")
       list = list.grep(/#{opts[:backup_id]}/) if !opts[:backup_id].nil?
 
-      backups = parse_backup_list(list)
+      backups = Backups.new(parse_backup_list(list))
       backups.each do |backup|
         parse_backup_info_file(backup)
         if opts[:with_wal_files]
