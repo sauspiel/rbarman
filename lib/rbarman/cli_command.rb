@@ -318,7 +318,7 @@ module RBarman
     #   clicommand.recover('test2', '20130218T080002', '/var/lib/postgresql/9.2/main', { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
     def recover(server, backup_id, path, opts={})
       args = create_recovery_cmd_args(opts)
-      run_barman_command("barman recover #{args} #{server} #{backup_id} #{path}")
+      run_barman_command("recover #{args} #{server} #{backup_id} #{path}")
     end
 
     # Creates an argument string for barman recovery command based on opts Hash
