@@ -206,7 +206,7 @@ module RBarman
     #   backup.recover('/var/lib/postgresql/9.2/main', { :remote_ssh_cmd => 'ssh postgres@10.20.20.2' })
     def recover(path, opts = {})
       cmd = CliCommand.new
-      cmd.recover(@server, @id, opts)
+      cmd.recover(@server, @id, path, opts)
     end
 
     # Instructs the underlying (barman) command to create a new backup.

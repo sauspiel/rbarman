@@ -191,4 +191,16 @@ describe Backup do
       expect(Backup.create('test').id).to eq("20130305T130002")
     end
   end
+
+  describe ".recover" do
+    it 'should call barman with correct arguments' do
+      @backup.server = 'test'
+      @backup.id = "20130304T080002"
+      CliCommand.any_instance.stub(:binary=)
+      CliCommand.any_instance.stub(:recover)
+      CliCommand.any_instance.should_receive(:recover).once.with(
+        @backup.server, @backup.id, '/var/lib/postgresql/9.2/main', {:test => 123 })
+      @backup.recover('/var/lib/postgresql/9.2/main', {:test => 123})
+    end
+  end
 end
