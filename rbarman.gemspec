@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = RBarman::VERSION
   spec.authors       = ["Holger Amann"]
   spec.email         = ["holger@sauspiel.de"]
-  spec.description   = %q{Wrapper about 2ndQuadrant's postgresql backup tool 'barman'}
-  spec.summary       = %q{Wrapper about 2ndQuadrant's postgresql backup tool 'barman'}
+  spec.description   = %q{Wrapper for 2ndQuadrant's PostgreSQL backup tool 'barman'}
+  spec.summary       = %q{Wrapper for 2ndQuadrant's PostgreSQL backup tool 'barman'}
   spec.homepage      = "https://github.com/sauspiel/rbarman"
   spec.license       = "MIT"
 
