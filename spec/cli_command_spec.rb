@@ -180,7 +180,7 @@ describe CliCommand do
       expect(backups[0].id).to eq("20130218T080002")
       expect(backups[0].size).to eq(233655051378)
       expect(backups[0].status).to eq(:done)
-      expect(backups[0].wal_file_size).to eq(CliCommand.size_in_bytes(130.0, "GiB"))
+      expect(backups[0].wal_file_size).to eq(9784501)
       expect(backups[0].wal_files.count).to eq(2)
     end
 

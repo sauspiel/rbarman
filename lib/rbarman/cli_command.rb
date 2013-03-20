@@ -69,7 +69,10 @@ module RBarman
         parse_backup_info_file(backup)
         if opts[:with_wal_files]
           wals = wal_files(backup.server, backup.id)
-          wals.each { |w| backup.add_wal_file(w) }
+          # using exact wal file size from xlog.db. show-backup is too inaccurate
+          backup.wal_files = wals
+          backup.wal_file_size = 0
+          wals.each { |w| backup.wal_file_size += w.size }
         end
       end
       return backups
