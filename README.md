@@ -1,5 +1,7 @@
 # rbarman
 
+[![Build Status](https://travis-ci.org/sauspiel/rbarman.png?branch=master)](https://travis-ci.org/sauspiel/rbarman)
+
 rbarman - Ruby Wrapper for 2ndQuadrant's PostgreSQL backup tool [barman](http://pgbarman.org)
 
 ## Installation
