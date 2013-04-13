@@ -87,7 +87,7 @@ module RBarman
     def server(name, opts = {})
       lines = run_barman_command("show-server #{name}")
       server = parse_show_server_lines(name, lines)
-      lines = run_barman_command("check #{name}")
+      lines = run_barman_command("check #{name}", { :abort_on_error => false })
       parse_check_lines(server, lines)
       server.backups = backups(server.name, opts) if opts[:with_backups]
       return server
@@ -342,14 +342,14 @@ module RBarman
     end
 
     private
-    def run_barman_command(args)
+    def run_barman_command(args, opts = {})
       sh = Mixlib::ShellOut.new("#{@binary} #{args}")
 
       # TODO timeout should be configurable
       sh.timeout = 43200 # 12h
 
       sh.run_command
-      sh.error!
+      sh.error! if opts[:abort_on_error].nil || opts[:abort_on_error]
       return sh.stdout.split("\n")
     end
 
