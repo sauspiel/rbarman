@@ -349,7 +349,7 @@ module RBarman
       sh.timeout = 43200 # 12h
 
       sh.run_command
-      sh.error! if opts[:abort_on_error].nil || opts[:abort_on_error]
+      sh.error! if opts[:abort_on_error].nil? || opts[:abort_on_error]
       return sh.stdout.split("\n")
     end
 
