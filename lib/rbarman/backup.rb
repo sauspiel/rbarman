@@ -192,6 +192,47 @@ module RBarman
       @deleted = true
     end
 
+    # @return [Array, String] a range of available xlog entries
+    def xlog_range
+      start_xlog = @begin_wal.xlog
+      end_xlog = @wal_files.last.xlog
+      xlog_range = Array.new
+      (start_xlog.to_i(16)..end_xlog.to_i(16)).to_a.each do |i|
+        xlog_range << i.to_s(16).upcase
+      end
+      xlog_range
+    end
+
+    # @return [WalFiles] all wal files which should exist in this backup
+    def needed_wal_files
+      needed = Array.new
+      xlog_range.each do |xlog|
+        start = 0
+        if @begin_wal.xlog == xlog.to_s.rjust(8,'0')
+          start = @begin_wal.segment.to_i(16)
+        end
+        (start..254).each do |seg|
+          w = WalFile.new
+          w.timeline = @begin_wal.timeline
+          w.xlog = xlog.rjust(8,'0')
+          w.segment = seg.to_s(16).rjust(8,'0').upcase
+          needed << w
+          break if w == @wal_files.last
+        end
+      end
+      WalFiles.new(needed)
+    end
+
+    # @return [WalFiles] all wal files which don't exist in this backup
+    def missing_wal_files
+      missing = Array.new
+      needed_wal_files.each do |needed|
+        existing = @wal_files.select { |f| f == needed }.first
+        missing << existing unless existing 
+      end
+      WalFiles.new(missing)
+    end
+
     # Instructs the underlying (barman) command to recover this backup
     # @param [String] path the path to which the backup should be restored
     # @param [Hash] opts options passed as arguments to barman recover cmd

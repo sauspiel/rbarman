@@ -166,6 +166,73 @@ describe Backup do
     end
   end
 
+  describe "xlog_range" do
+    it 'should return the range of xlog entries' do
+      @backup.begin_wal = WalFile.parse("0000000100000CB6000000EC")
+      @backup.add_wal_file(WalFile.parse("0000000100000CB700000010"))
+      xlog_range = @backup.xlog_range
+      expect(xlog_range.count).to eq(2)
+      expect(xlog_range[0]).to eq("CB6")
+      expect(xlog_range[1]).to eq("CB7")
+    end
+  end
+
+  describe "needed_wal_files" do
+    it 'should return an array of wal files which should be available in a backup' do
+      @backup.begin_wal = WalFile.parse("0000000100000CB6000000EC")
+      @backup.add_wal_file(WalFile.parse("0000000100000CB700000010"))
+      needed = @backup.needed_wal_files
+      expect(needed.count).to eq 36
+      expect(needed.first.segment).to eq("000000EC")
+      expect(needed.last.segment).to eq("00000010")
+    end
+  end
+
+  describe "missing_wal_files" do
+    it 'should return all missing wal files' do
+      @backup.begin_wal = WalFile.parse("0000000100000CB6000000EC")
+      [ "0000000100000CB6000000EC",
+        "0000000100000CB6000000ED",
+        "0000000100000CB6000000EE",
+        "0000000100000CB6000000EF",
+        "0000000100000CB6000000F0",
+        "0000000100000CB6000000F1",
+        "0000000100000CB6000000F2",
+        "0000000100000CB6000000F3",
+        "0000000100000CB6000000F5",
+        "0000000100000CB6000000F6",
+        "0000000100000CB6000000F7",
+        "0000000100000CB6000000F8",
+        "0000000100000CB6000000F9",
+        "0000000100000CB6000000FA",
+        "0000000100000CB6000000FB",
+        "0000000100000CB6000000FC",
+        "0000000100000CB6000000FD",
+        "0000000100000CB6000000FE",
+        "0000000100000CB700000000",
+        "0000000100000CB700000001",
+        "0000000100000CB700000002",
+        "0000000100000CB700000003",
+        "0000000100000CB700000004",
+        "0000000100000CB700000006",
+        "0000000100000CB700000007",
+        "0000000100000CB700000008",
+        "0000000100000CB700000009",
+        "0000000100000CB70000000A",
+        "0000000100000CB70000000B",
+        "0000000100000CB70000000C",
+        "0000000100000CB70000000D",
+        "0000000100000CB70000000E",
+        "0000000100000CB70000000F",
+        "0000000100000CB700000010"
+      ].each { |f| @backup.add_wal_file(f) }
+      #  #"0000000100000CB6000000F4",
+      #  #"0000000100000CB700000005",
+      missing_wals = @backup.missing_wal_files
+      expect(missing_wals.count).to eq(2)
+    end
+  end
+
   describe "delete" do
     it 'should set deleted to true' do
       @backup.server = "test"
