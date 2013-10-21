@@ -122,8 +122,8 @@ module RBarman
         wal = "#{w.timeline}#{w.xlog}#{w.segment}"
         entry = xlog_db[wal]
         w.size = entry[:size]
-        w.compression = entry[:compression]
-        w.created = entry[:created]
+        w.compression = entry[:compression].downcase.to_sym
+        w.created = entry[:created].to_i
       end
       return wal_files
     end
