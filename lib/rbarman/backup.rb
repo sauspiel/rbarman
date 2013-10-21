@@ -214,7 +214,14 @@ module RBarman
         if @begin_wal.xlog == xlog.to_s.rjust(8,'0')
           start = @begin_wal.segment.to_i(16)
         end
-        (start..254).each do |seg|
+
+        # http://wiki.postgresql.org/wiki/What's_new_in_PostgreSQL_9.3#WAL_filenames_may_end_in_FF
+        end_segment = 255
+        if @pg_version.nil? || @pg_version < 90300
+          end_segment = 254
+        end
+
+        (start..end_segment).each do |seg|
           w = WalFile.new
           w.timeline = @begin_wal.timeline
           w.xlog = xlog.rjust(8,'0')

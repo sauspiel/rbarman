@@ -184,7 +184,28 @@ describe Backup do
       needed = @backup.needed_wal_files
       expect(needed.count).to eq 36
       expect(needed.first.segment).to eq("000000EC")
+      expect(needed.select { |n| n.segment == '000000EF' }.count).to eq 1
       expect(needed.last.segment).to eq("00000010")
+    end
+
+    it 'should not include segment xxxxxxFF if PG version < 9.3' do
+      @backup.begin_wal = WalFile.parse("0000000100000CB6000000E0")
+      @backup.add_wal_file(WalFile.parse("0000000100000CB6000000FE"))
+      @backup.pg_version = 90204
+      needed = @backup.needed_wal_files
+      expect(needed.count).to eq 31
+      expect(needed.select { |n| n.segment == '000000EF' }.count).to eq 1
+      expect(needed.select { |n| n.segment == '000000FF' }.count).to eq 0
+    end
+
+    it 'should include segment xxxxxxFF if PG version >= 9.3' do
+      @backup.begin_wal = WalFile.parse("0000000100000CB6000000E0")
+      @backup.add_wal_file(WalFile.parse("0000000100000CB6000000FF"))
+      @backup.pg_version = 90300
+      needed = @backup.needed_wal_files
+      expect(needed.count).to eq 32
+      expect(needed.select { |n| n.segment == '000000EF' }.count).to eq 1
+      expect(needed.select { |n| n.segment == '000000FF' }.count).to eq 1
     end
   end
 
