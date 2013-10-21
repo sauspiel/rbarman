@@ -117,13 +117,13 @@ module RBarman
     def wal_files(server, backup_id)
       lines = run_barman_command("list-files --target wal #{server} #{backup_id}")
       wal_files = parse_wal_files_list(lines)
-      xlog_db_lines = file_content("#{@barman_home}/#{server}/wals/xlog.db")
+      xlog_db = read_xlog_db(server)
       wal_files.each do |w| 
         wal = "#{w.timeline}#{w.xlog}#{w.segment}"
-        lines = xlog_db_lines.grep(/^#{wal}\t.+/)
-        raise(RuntimeError, "Found more than one wal file entry in xlog.db for #{wal}") if lines.count > 1
-        raise(RuntimeError, "Could not find any entry for #{wal} in xlog.db") if lines.count == 0
-        wal_file_info_from_xlog_db_line(w, lines[0])
+        entry = xlog_db[wal]
+        w.size = entry[:size]
+        w.compression = entry[:compression]
+        w.created = entry[:created]
       end
       return wal_files
     end
@@ -253,17 +253,6 @@ module RBarman
       end
     end
 
-    # Assigns size, created and compression values to a {WalFile} by parsing a line from xlog.db
-    # @param [WalFile] wal_file the wal file
-    # @param [String] line a string like '00000001000005A9000000BC\\t4684503\t1360568429.0\\tbzip2'
-    # @return [void]
-    def wal_file_info_from_xlog_db_line(wal_file, line)
-      splitted = line.split("\t")
-      wal_file.size = splitted[1]
-      wal_file.created = splitted[2].to_i
-      wal_file.compression = splitted[3].downcase.to_sym
-    end
-
     # Converts the size according to the unit to bytes
     # @param [Numeric] size the size
     # @param [String] unit the unit, like `B`, `KiB`, `MiB`, `GiB` or `TiB`
@@ -355,6 +344,19 @@ module RBarman
 
     def file_content(path)
       return File.readlines(path).map { |l| l.chomp }
+    end
+
+    def read_xlog_db(server)
+      result = Hash.new
+      File.readlines("#{@barman_home}/#{server}/wals/xlog.db").each do |line|
+        splitted = line.chomp.split("\t")
+        result[splitted[0]] = {
+          :size => splitted[1],
+          :created => splitted[2],
+          :compression => splitted[3].downcase.to_sym
+        }
+      end
+      result
     end
   end
 end

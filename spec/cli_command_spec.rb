@@ -167,13 +167,15 @@ describe CliCommand do
         "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BD"
       ]
 
-      xlog_db_lines = [
-        "00000001000005A9000000BC\t4684503\t1360568429.0\tbzip2",
-        "00000001000005A9000000BD\t5099998\t1360568442.0\tnone"
-      ]
+      
+      xlog_db = Hash.new
+      xlog_db["00000001000005A9000000BC"] = {:size => 4684503, :created => 1360568429.0, :compression => :bzip2 }
+      xlog_db["00000001000005A9000000BD"] = {:size => 5099998, :created => 1360568442.0, :compression => :bzip2 }
 
-      @cmd.stub!(:run_barman_command).and_return(backup_list, wal_files)
-      @cmd.stub!(:file_content).and_return(backup_info_lines, xlog_db_lines)
+
+      @cmd.stub(:run_barman_command).and_return(backup_list, wal_files)
+      @cmd.stub(:file_content).and_return(backup_info_lines)
+      @cmd.stub(:read_xlog_db).and_return(xlog_db)
       backups = @cmd.backups("test", { :with_wal_files => true })
       expect(backups).to be_an_instance_of Backups
       expect(backups.count).to eq(1)
@@ -211,10 +213,10 @@ describe CliCommand do
         "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BD"
       ]
 
-      xlog_db_lines = [
-        "00000001000005A9000000BC\t4684503\t1360568429.0\tbzip2",
-        "00000001000005A9000000BD\t5099998\t1360568442.0\tnone"
-      ]
+      xlog_db = Hash.new
+      xlog_db["00000001000005A9000000BC"] = {:size => 4684503, :created => 1360568429.0, :compression => :bzip2 }
+      xlog_db["00000001000005A9000000BD"] = {:size => 5099998, :created => 1360568442.0, :compression => :bzip2 }
+
 
       backup_info_lines = [
         "begin_time=2013-02-25 19:26:54.852814",
@@ -226,8 +228,9 @@ describe CliCommand do
         "begin_wal=0000000100000552000000B6",
         "end_wal=000000010000055700000031"
       ]
-      @cmd.stub!(:run_barman_command).and_return(backup_list, wal_files)
-      @cmd.stub!(:file_content).and_return(backup_info_lines, xlog_db_lines)
+      @cmd.stub(:run_barman_command).and_return(backup_list, wal_files)
+      @cmd.stub(:file_content).and_return(backup_info_lines)
+      @cmd.stub(:read_xlog_db).and_return(xlog_db)
       backup = @cmd.backup("test", "20130222T080002", { :with_wal_files => false })
       expect(backup.id).to eq("20130222T080002")
       expect(backup.wal_files).to eq(nil)
@@ -293,58 +296,16 @@ describe CliCommand do
         "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BD"
       ]
 
-      xlog_db_lines = [
-        "00000001000005A9000000BC\t4684503\t1360568429.0\tbzip2",
-        "00000001000005A9000000BD\t5099998\t1360568442.0\tnone",
-        "00000001000005A9000000BD.00000020.backup\t249\t1360562212.0\tnone"
-      ]
+      xlog_db = Hash.new
+      xlog_db["00000001000005A9000000BC"] = {:size => 4684503, :created => 1360568429.0, :compression => :bzip2 }
+      xlog_db["00000001000005A9000000BD"] = {:size => 5099998, :created => 1360568442.0, :compression => :bzip2 }
+      xlog_db["00000001000005A9000000BD.00000020.backup"] = {:size => 249, :created => 1360562212.0, :compression => :none }
 
       @cmd.stub!(:run_barman_command).and_return(lines)
-      @cmd.stub!(:file_content).and_return(xlog_db_lines)
+      @cmd.stub!(:read_xlog_db).and_return(xlog_db)
 
       wal_files = @cmd.wal_files("test", "123")
       expect(wal_files.count).to eq(2)
-    end
-
-    it 'should return an RuntimeError if xlog.db does not contain an entry for a wal' do
-      lines = [
-        "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC"
-      ]
-
-      xlog_db_lines = [
-      ]
-
-      @cmd.stub!(:run_barman_command).and_return(lines)
-      @cmd.stub!(:file_content).and_return(xlog_db_lines)
-
-      expect { @cmd.wal_files("test", "123") }.to raise_error(RuntimeError)
-    end
-
-    it 'should return an RuntimeError if xlog.db does contain more than one entry for a wal' do
-      lines = [
-        "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC"
-      ]
-
-      xlog_db_lines = [
-        "00000001000005A9000000BC\t4684503\t1360568429.0\tbzip2",
-        "00000001000005A9000000BC\t4682233\t1360568442.0\tbzip2",
-      ]
-
-      @cmd.stub!(:run_barman_command).and_return(lines)
-      @cmd.stub!(:file_content).and_return(xlog_db_lines)
-
-      expect { @cmd.wal_files("test", "123") }.to raise_error(RuntimeError)
-    end
-  end
-
-  describe "wal_file_info_from_xlog_db_line" do
-    it 'should set wal file infos from a xlog db line' do
-      line = "000000010000049A000000FA\t4684503\t1360568429.0\tbzip2"
-      w = WalFile.parse("000000010000049A000000FA")
-      @cmd.wal_file_info_from_xlog_db_line(w, line)
-      expect(w.size).to eq(4684503)
-      expect(w.created).to eq(Time.at(1360568429))
-      expect(w.compression).to eq("bzip2".to_sym)
     end
   end
 
