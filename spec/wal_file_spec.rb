@@ -14,7 +14,16 @@ describe WalFile do
     end
   end
 
-  describe "timeline=" do
+  describe "#to_s" do
+    it 'should return a string representation' do
+      @wal_file.timeline = '00000001'
+      @wal_file.xlog = '000000BC'
+      @wal_file.segment = '000000FE'
+      expect(@wal_file.to_s).to eq('00000001000000BC000000FE')
+    end
+  end
+
+  describe "#timeline=" do
     it 'should raise ArgumentError if arg is not of size 8' do
       lambda { @wal_file.timeline = "123" }.should raise_error(ArgumentError)
       lambda { @wal_file.timeline = "123456789" }.should raise_error(ArgumentError)
@@ -27,7 +36,7 @@ describe WalFile do
     end
   end
 
-  describe "xlog=" do
+  describe "#xlog=" do
     it 'should raise ArgumentError if arg is not of size 8' do
       lambda { @wal_file.xlog = "123" }.should raise_error(ArgumentError)
       lambda { @wal_file.xlog = "123456789" }.should raise_error(ArgumentError)
@@ -40,7 +49,7 @@ describe WalFile do
     end
   end
 
-  describe "segment=" do
+  describe "#segment=" do
     it 'should raise ArgumentError if arg is not of size 8' do
       lambda { @wal_file.segment = "123" }.should raise_error(ArgumentError)
       lambda { @wal_file.segment = "123456789" }.should raise_error(ArgumentError)
@@ -53,7 +62,7 @@ describe WalFile do
     end
   end
 
-  describe "created=" do
+  describe "#created=" do
     it 'should assign created from float' do
       arg = 1362668936.0
       @wal_file.created = arg
@@ -79,7 +88,7 @@ describe WalFile do
     end
   end
 
-  describe "size=" do
+  describe "#size=" do
     it 'should assign a size' do
       a = 123
       @wal_file.size = a
@@ -87,7 +96,7 @@ describe WalFile do
     end
   end
 
-  describe "compression=" do
+  describe "#compression=" do
     it 'should raise ArgumentError if arg not like :gzip, :bzip2, :none or :custom' do
       expect { @wal_file.compression = 'started' }.to raise_error(ArgumentError)
       expect { @wal_file.compression = :some }.to raise_error(ArgumentError)

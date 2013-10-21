@@ -60,6 +60,10 @@ module RBarman
     def initialize
     end
 
+    def to_s
+      "#{timeline}#{xlog}#{segment}"
+    end
+
     def timeline=(timeline)
       validate(timeline)
       @timeline = timeline
