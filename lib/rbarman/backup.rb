@@ -13,6 +13,9 @@ module RBarman
     # @return [String, nil] name of the server to which the backup belongs. 
     attr_accessor :server 
 
+    # @return [Integer, nil] the backup's PostgreSQL version 
+    attr_accessor :pg_version
+
     # @overload id
     #   @return [String, nil] id (like '20130304T080002') which identifies 
     #     the backup and is unique among all backups of a server. 

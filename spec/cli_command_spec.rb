@@ -160,7 +160,8 @@ describe CliCommand do
         "pgdata=/var/lib/postgresql/9.2/main",
         "timeline=1",
         "begin_wal=0000000100000552000000B6",
-        "end_wal=000000010000055700000031"
+        "end_wal=000000010000055700000031",
+        "version=90204"
       ]
       wal_files = [
         "/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC",
@@ -260,7 +261,8 @@ describe CliCommand do
         "pgdata=/var/lib/postgresql/9.2/main",
         "timeline=1",
         "begin_wal=0000000100000552000000B6",
-        "end_wal=000000010000055700000031"
+        "end_wal=000000010000055700000031",
+        "version=90204",
       ]
       @cmd.stub!(:file_content).and_return(lines)
 
@@ -273,6 +275,7 @@ describe CliCommand do
       expect(backup.timeline).to eq(1)
       expect(backup.begin_wal).to eq(WalFile.parse("0000000100000552000000B6"))
       expect(backup.end_wal).to eq(WalFile.parse("000000010000055700000031"))
+      expect(backup.pg_version).to eq(90204)
     end
   end
 
@@ -349,6 +352,7 @@ describe CliCommand do
       expect(s.backup_dir).to eq("/var/lib/barman/test")
       expect(s.base_backups_dir).to eq("/var/lib/barman/test/base")
       expect(s.wals_dir).to eq("/var/lib/barman/test/wals")
+      expect(s.pg_version).to eq("9.2.3")
     end
   end
 

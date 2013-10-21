@@ -45,6 +45,10 @@ module RBarman
     # @return [Backups, nil] server backups
     attr_accessor :backups
 
+    # @param [String] PostgreSQL version
+    # @return [String] PostgreSQL version
+    attr_accessor :pg_version
+
 
     # Creates a new instance of {Server}
     def initialize(name)

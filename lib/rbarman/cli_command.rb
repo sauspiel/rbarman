@@ -162,6 +162,8 @@ module RBarman
           s.base_backups_dir = value
         when "wals_directory"
           s.wals_dir = value
+        when "server_txt_version"
+          s.pg_version = value
         end
       end
       return s
@@ -249,6 +251,8 @@ module RBarman
           backup.end_wal = WalFile.parse(value)
         when "pgdata"
           backup.pgdata = value
+        when "version"
+          backup.pg_version = value.to_i
         end
       end
     end
