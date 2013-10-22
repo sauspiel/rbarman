@@ -238,7 +238,7 @@ module RBarman
       missing = Array.new
       needed_wal_files.each do |needed|
         existing = @wal_files.select { |f| f == needed }.first
-        missing << existing unless existing 
+        missing << needed unless existing 
       end
       WalFiles.new(missing)
     end

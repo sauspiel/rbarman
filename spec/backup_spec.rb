@@ -247,10 +247,10 @@ describe Backup do
         "0000000100000CB70000000F",
         "0000000100000CB700000010"
       ].each { |f| @backup.add_wal_file(f) }
-      #  #"0000000100000CB6000000F4",
-      #  #"0000000100000CB700000005",
       missing_wals = @backup.missing_wal_files
       expect(missing_wals.count).to eq(2)
+      expect(missing_wals[0]).to eq("0000000100000CB6000000F4")
+      expect(missing_wals[1]).to eq("0000000100000CB700000005")
     end
   end
 
