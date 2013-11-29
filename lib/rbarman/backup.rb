@@ -222,10 +222,10 @@ module RBarman
         end
 
         (start..end_segment).each do |seg|
-          w = WalFile.new
-          w.timeline = @begin_wal.timeline
-          w.xlog = xlog.rjust(8,'0')
-          w.segment = seg.to_s(16).rjust(8,'0').upcase
+          n_timeline = @begin_wal.timeline
+          n_xlog = xlog.rjust(8,'0')
+          n_segment = seg.to_s(16).rjust(8,'0').upcase
+          w = WalFile.parse(n_timeline + n_xlog + n_segment)
           needed << w
           break if w == @wal_files.last
         end
