@@ -237,7 +237,13 @@ module RBarman
     def missing_wal_files
       missing = Array.new
       needed_wal_files.each do |needed|
-        existing = @wal_files.select { |f| f == needed }.first
+        existing = nil
+        @wal_files.each do |f|
+          if f == needed
+            existing = f
+            break
+          end
+        end
         missing << needed unless existing 
       end
       WalFiles.new(missing)
