@@ -186,7 +186,6 @@ describe CliCommand do
       expect(backups[0].wal_file_size).to eq(9784501)
       expect(backups[0].wal_files.count).to eq(2)
     end
-
   end
 
   describe "backup" do
@@ -275,6 +274,32 @@ describe CliCommand do
       expect(backup.timeline).to eq(1)
       expect(backup.begin_wal).to eq(WalFile.parse("0000000100000552000000B6"))
       expect(backup.end_wal).to eq(WalFile.parse("000000010000055700000031"))
+      expect(backup.pg_version).to eq(90204)
+    end
+
+    it 'should not set size or end_* if backup has started' do
+      lines = [
+        "begin_time=2013-02-25 19:26:54.852814",
+        "end_time=None",
+        "status=STARTED",
+        "size=None",
+        "pgdata=/var/lib/postgresql/9.2/main",
+        "timeline=1",
+        "begin_wal=0000000100000552000000B6",
+        "end_wal=None",
+        "version=90204",
+      ]
+      @cmd.stub!(:file_content).and_return(lines)
+
+      backup = Backup.new.tap { |b| b.id = "20130304T080002"; b.server = "test" }
+      @cmd.parse_backup_info_file(backup)
+      expect(backup.backup_start).to eq(Time.parse(lines[0].split("=")[1]))
+      expect(backup.backup_end).to eq(nil)
+      expect(backup.status).to eq(lines[2].split("=")[1].downcase.to_sym)
+      expect(backup.size).to eq(nil)
+      expect(backup.timeline).to eq(1)
+      expect(backup.begin_wal).to eq(WalFile.parse("0000000100000552000000B6"))
+      expect(backup.end_wal).to eq(nil)
       expect(backup.pg_version).to eq(90204)
     end
   end
