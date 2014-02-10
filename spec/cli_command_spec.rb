@@ -5,7 +5,7 @@ include RBarman
 describe CliCommand do
 
   before :each do
-    File.stub!(:exists?).and_return(true)
+    File.stub(:exists?).and_return(true)
     @cmd = CliCommand.new("/path/to/barman", "/path/to/barman_home")
   end
 
@@ -31,19 +31,19 @@ describe CliCommand do
 
   describe "binary=" do
     it 'should raise ArgumentError if binary does not exist' do
-      File.stub!(:exists?).and_return(false)
+      File.stub(:exists?).and_return(false)
       lambda { @cmd.binary = "/bin/true" }.should raise_error(ArgumentError)
     end
 
     it 'should rais ArgumentError if arg does not end with \'barman\'' do
-      File.stub!(:exists?).and_return(true)
-      File.stub!(:basename).and_return('abc')
+      File.stub(:exists?).and_return(true)
+      File.stub(:basename).and_return('abc')
       lambda { @cmd.binary = "/bin/true" }.should raise_error(ArgumentError)
     end
 
     it 'should set binary to value of path if exists' do
-      File.stub!(:exists?).and_return(true)
-      File.stub!(:basename).and_return('barman')
+      File.stub(:exists?).and_return(true)
+      File.stub(:basename).and_return('barman')
       @cmd.binary = "/path/to/barman"
       @cmd.binary.should == "/path/to/barman"
     end
@@ -51,12 +51,12 @@ describe CliCommand do
 
   describe "barman_home=" do
     it 'should raise ArgumentError if path does not exist' do
-      File.stub!(:exists?).and_return(false)
+      File.stub(:exists?).and_return(false)
       lambda { @cmd.barman_home = "/bin/true" }.should raise_error(ArgumentError)
     end
 
     it 'should set barman_home to value of path if exists' do
-      File.stub!(:exists?).and_return(true)
+      File.stub(:exists?).and_return(true)
       @cmd.barman_home = "/path/to/barman_home"
       @cmd.barman_home == "/path/to/barman_home"
     end
@@ -144,7 +144,7 @@ describe CliCommand do
 
   describe "backups" do
     it 'should return an empty array if there are no backups' do
-      @cmd.stub!(:run_barman_command).and_return([])
+      @cmd.stub(:run_barman_command).and_return([])
       @cmd.backups("test").should be_an_instance_of Backups
     end
 
@@ -198,7 +198,7 @@ describe CliCommand do
         "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB",
         "test 20130222T080002 - Mon Feb 22 18:11:16 2013 - Size: 248.0 GiB - WAL Size: 135.0 GiB",
       ]
-      @cmd.stub!(:run_barman_command).and_return(backup_list, nil)
+      @cmd.stub(:run_barman_command).and_return(backup_list, nil)
       backup = @cmd.backup("test", "20130222T081210")
       expect(backup).to eq(nil)
     end
@@ -263,7 +263,7 @@ describe CliCommand do
         "end_wal=000000010000055700000031",
         "version=90204",
       ]
-      @cmd.stub!(:file_content).and_return(lines)
+      @cmd.stub(:file_content).and_return(lines)
 
       backup = Backup.new.tap { |b| b.id = "20130304T080002"; b.server = "test" }
       @cmd.parse_backup_info_file(backup)
@@ -289,7 +289,7 @@ describe CliCommand do
         "end_wal=None",
         "version=90204",
       ]
-      @cmd.stub!(:file_content).and_return(lines)
+      @cmd.stub(:file_content).and_return(lines)
 
       backup = Backup.new.tap { |b| b.id = "20130304T080002"; b.server = "test" }
       @cmd.parse_backup_info_file(backup)
@@ -329,8 +329,8 @@ describe CliCommand do
       xlog_db["00000001000005A9000000BD"] = {:size => 5099998, :created => 1360568442.0, :compression => :bzip2 }
       xlog_db["00000001000005A9000000BD.00000020.backup"] = {:size => 249, :created => 1360562212.0, :compression => :none }
 
-      @cmd.stub!(:run_barman_command).and_return(lines)
-      @cmd.stub!(:read_xlog_db).and_return(xlog_db)
+      @cmd.stub(:run_barman_command).and_return(lines)
+      @cmd.stub(:read_xlog_db).and_return(xlog_db)
 
       wal_files = @cmd.wal_files("test", "123")
       expect(wal_files.count).to eq(2)
@@ -427,8 +427,8 @@ describe CliCommand do
 
       show_lines = ["\tactive: true"]
       check_lines = ["\tssh: OK"]
-      @cmd.stub!(:run_barman_command).and_return(show_lines, check_lines, backup_list)
-      @cmd.stub!(:file_content).and_return(backup_info_lines)
+      @cmd.stub(:run_barman_command).and_return(show_lines, check_lines, backup_list)
+      @cmd.stub(:file_content).and_return(backup_info_lines)
       server = @cmd.server("test123", { :with_backups => true })
       expect(server.name).to eq("test123")
       expect(server.active).to eq(true)

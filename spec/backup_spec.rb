@@ -258,7 +258,7 @@ describe Backup do
     it 'should set deleted to true' do
       @backup.server = "test"
       @backup.id = "20130304T080002"
-      File.stub!(:exists?).and_return(true)
+      File.stub(:exists?).and_return(true)
       CliCommand.any_instance.stub(:delete)
       CliCommand.any_instance.should_receive(:delete).once.with(@backup.server, @backup.id)
       @backup.delete
@@ -268,7 +268,7 @@ describe Backup do
 
   describe "create" do
     it 'should create a backup and return the latest backup' do
-      File.stub!(:exists?).and_return(true, true)
+      File.stub(:exists?).and_return(true)
       CliCommand.any_instance.stub(:create)
       backups = Backups.new
       backups << Backup.new.tap { |b| b.id = "20130304T080002" }
