@@ -212,7 +212,7 @@ module RBarman
         status_match.nil? ? b.status = :done : b.status = status_match[1].downcase.to_sym
         
         if b.status == :done
-          sizematch = l.match(/.+Size:\s(.+)\s(.+)\s-.+Size:\s(.+)\s(.+)/)
+          sizematch = l.match(/.+Size:\s(\S+)\s(\S+)\s-.+Size:\s(\S+)\s(\S+)/)
           b.size = CliCommand.size_in_bytes(sizematch[1].to_f, sizematch[2])
           b.wal_file_size = CliCommand.size_in_bytes(sizematch[3].to_f, sizematch[4])
         end

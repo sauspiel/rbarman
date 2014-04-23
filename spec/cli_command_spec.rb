@@ -67,7 +67,7 @@ describe CliCommand do
     it 'should return an array of backup' do
       lines = [
         "test 20130225T192654 - Tue Feb 26 05:50:05 2013 - Size: 217.0 GiB - WAL Size: 72.0 GiB",
-        "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB"
+        "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB (tablespaces: kbill_tbs:/opt/data/postgres)"
       ]
       backups = @cmd.parse_backup_list(lines)
       backups[0].id.should == "20130225T192654"
@@ -196,7 +196,7 @@ describe CliCommand do
     it 'should return nil if there is no such backup' do
       backup_list = [
         "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB",
-        "test 20130222T080002 - Mon Feb 22 18:11:16 2013 - Size: 248.0 GiB - WAL Size: 135.0 GiB",
+        "test 20130222T080002 - Mon Feb 22 18:11:16 2013 - Size: 248.0 GiB - WAL Size: 135.0 GiB (tablespaces: kbill_tbs:/opt/data/postgres)",
       ]
       @cmd.stub(:run_barman_command).and_return(backup_list, nil)
       backup = @cmd.backup("test", "20130222T081210")
@@ -205,7 +205,7 @@ describe CliCommand do
 
     it 'should return a specific backup without wal files' do
       backup_list = [
-        "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB",
+        "test 20130218T080002 - Mon Feb 18 18:11:16 2013 - Size: 213.0 GiB - WAL Size: 130.0 GiB (tablespaces: kbill_tbs:/opt/data/postgres)",
         "test 20130222T080002 - Mon Feb 22 18:11:16 2013 - Size: 248.0 GiB - WAL Size: 135.0 GiB",
       ]
       wal_files = [
