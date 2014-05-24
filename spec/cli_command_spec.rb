@@ -183,8 +183,50 @@ describe CliCommand do
       expect(backups[0].id).to eq("20130218T080002")
       expect(backups[0].size).to eq(233655051378)
       expect(backups[0].status).to eq(:done)
+      expect(backups[0].error).to eq(nil)
       expect(backups[0].wal_file_size).to eq(9784501)
       expect(backups[0].wal_files.count).to eq(2)
+    end
+
+    it 'should handle None values if backup failed' do
+
+      backup_list = [
+        "test 20140525T003409 - FAILED",
+      ]
+      backup_info_lines = [
+        "backup_label=None",
+        "begin_offset=None",
+        "begin_time=None",
+        "begin_wal=None",
+        "begin_xlog=None",
+        "config_file=None",
+        "end_offset=None",
+        "end_time=None",
+        "end_wal=None",
+        "end_xlog=None",
+        "error=failure detecting data directory (could not connect to server: Connection timed out)",
+        "hba_file=None",
+        "ident_file=None",
+        "mode=default",
+        "pgdata=None",
+        "server_name=test",
+        "size=None",
+        "status=FAILED",
+        "tablespaces=None",
+        "timeline=None",
+        "version=None"
+      ]
+      @cmd.stub(:run_barman_command).and_return(backup_list, [])
+      @cmd.stub(:file_content).and_return(backup_info_lines)
+      @cmd.stub(:read_xlog_db).and_return([])
+      backups = @cmd.backups("test", { :with_wal_files => true })
+      expect(backups.count).to eq(1)
+      expect(backups[0].status).to eq(:failed)
+      expect(backups[0].id).to eq("20140525T003409")
+      expect(backups[0].size).to eq(nil)
+      expect(backups[0].error).to eq("failure detecting data directory (could not connect to server: Connection timed out)")
+      expect(backups[0].wal_file_size).to eq(0)
+      expect(backups[0].wal_files.count).to eq(0)
     end
   end
 

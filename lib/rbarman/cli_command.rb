@@ -235,24 +235,31 @@ module RBarman
       backup_info.each do |l|
         key, value = l.split("=")
         case key
-        when "begin_time"
-          backup.backup_start = value
-        when "end_time"
-          backup.backup_end = value unless value == 'None'
         when "status"
           backup.status = value.downcase.to_sym
-        when "size"
-          backup.size = value.to_i unless value == 'None'
-        when "timeline"
-          backup.timeline = value.to_i
-        when "begin_wal"
-          backup.begin_wal = WalFile.parse(value)
-        when "end_wal"
-          backup.end_wal = WalFile.parse(value) unless value == 'None'
-        when "pgdata"
-          backup.pgdata = value
-        when "version"
-          backup.pg_version = value.to_i
+        end
+
+        unless value == 'None'
+          case key
+          when "begin_time"
+            backup.backup_start = value
+          when "end_time"
+            backup.backup_end = value
+          when "size"
+            backup.size = value.to_i
+          when "timeline"
+            backup.timeline = value.to_i
+          when "begin_wal"
+            backup.begin_wal = WalFile.parse(value)
+          when "end_wal"
+            backup.end_wal = WalFile.parse(value)
+          when "pgdata"
+            backup.pgdata = value
+          when "version"
+            backup.pg_version = value.to_i
+          when "error"
+            backup.error = value
+          end
         end
       end
     end

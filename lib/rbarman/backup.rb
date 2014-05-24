@@ -100,6 +100,14 @@ module RBarman
     #   @raise [ArgumentError] if path is empty
     attr_reader :pgdata
 
+    # @overload error
+    #   @return [String, nil] error message
+    # @overload error=
+    #   Contains the error message if backup failed
+    #   @param [String] the error
+    attr_reader :error
+
+
     # @return [Boolean] if the backup has been deleted
     attr_reader :deleted
 
@@ -162,6 +170,10 @@ module RBarman
       @pgdata = path
     end
 
+    def error=(error)
+      @error = error
+    end
+
     # Adds a wal file to the backup
     # @param [String, WalFile] wal_file the wal file
     # @return [void]
@@ -176,7 +188,6 @@ module RBarman
       return false if @wal_files.nil?
       return @wal_files.include?(WalFile.parse(wal_file))
     end
-
 
     # @return [Boolean] if id is a valid backup id
     # @param [#to_s] id the backup id
