@@ -7,7 +7,8 @@ VAGRANT_HOSTNAME=packer-debian-7
 sudo su -c 'echo "deb     http://apt.postgresql.org/pub/repos/apt wheezy-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
 sudo su -c 'echo "deb http://ftp.de.debian.org/debian/ wheezy-backports main" >> /etc/apt/sources.list.d/backports.list'
 sudo apt-get update
-sudo apt-get install git-core build-essential postgresql-$POSTGRES_VERSION postgresql-server-dev-$POSTGRES_VERSION postgresql-contrib-$POSTGRES_VERSION barman=$BARMAN_VERSION tmux zsh inotify-tools -y --force-yes
+sudo apt-get install git-core build-essential postgresql-$POSTGRES_VERSION postgresql-server-dev-$POSTGRES_VERSION postgresql-contrib-$POSTGRES_VERSION barman=$BARMAN_VERSION ruby tmux zsh inotify-tools -y --force-yes
+sudo gem install bundler
 
 sudo -u postgres createdb -E UTF8 rbarman_development -l en_US.UTF-8 -T template0
 
