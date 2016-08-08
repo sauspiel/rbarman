@@ -12,7 +12,7 @@ module RBarman
     #   Path to the barman binary
     #   @param [String] path path to the binary
     #   @raise [ArgumentError] if path doesn't exist or path doesn't end with 'barman'
-    attr_reader :binary 
+    attr_reader :binary
 
     # @overload barman_home
     #   @return [String] base path where barman stores its backups
@@ -118,7 +118,7 @@ module RBarman
       lines = run_barman_command("list-files --target wal #{server} #{backup_id}")
       wal_files = parse_wal_files_list(lines)
       xlog_db = read_xlog_db(server)
-      wal_files.each do |w| 
+      wal_files.each do |w|
         wal = "#{w.timeline}#{w.xlog}#{w.segment}"
         entry = xlog_db[wal]
         w.size = entry[:size]
@@ -190,11 +190,10 @@ module RBarman
     # @param [Array<String>] lines an array of lines like '/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC'
     # @return [WalFiles] the {WalFiles}
     def parse_wal_files_list(lines)
-      wal_files = Array.new
-      lines.each do |line|
-        wal_files << WalFile.parse(line.split("/").last)
+      lines.each_with_object([]) do |line, wal_files|
+        file_name = line.split('/').last
+        wal_files << WalFile.parse(file_name) if file_name.length == 24
       end
-      return wal_files
     end
 
     # Creates an array of {Backup} by parsing lines reported by barman
@@ -210,7 +209,7 @@ module RBarman
 
         status_match = l.match(/.+(FAILED|STARTED)/)
         status_match.nil? ? b.status = :done : b.status = status_match[1].downcase.to_sym
-        
+
         if b.status == :done
           sizematch = l.match(/.+Size:\s(\S+)\s(\S+)\s-.+Size:\s(\S+)\s(\S+)/)
           b.size = CliCommand.size_in_bytes(sizematch[1].to_f, sizematch[2])
@@ -275,7 +274,7 @@ module RBarman
     def self.size_in_bytes(size, unit)
       raise(ArgumentError, "unit not one of B|KiB|MiB|GiB|TiB") if !unit.match(/(B|KiB|MiB|GiB|TiB)/)
       size_b = 0
-      case unit 
+      case unit
       when "B"
         size_b = size
       when "KiB"
@@ -285,7 +284,7 @@ module RBarman
       when "GiB"
         size_b = size * 1024 ** 3
       when "TiB"
-        size_b = size * 1024 ** 4 
+        size_b = size * 1024 ** 4
       end
       return size_b.to_i
     end
