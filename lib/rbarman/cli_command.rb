@@ -12,7 +12,7 @@ module RBarman
     #   Path to the barman binary
     #   @param [String] path path to the binary
     #   @raise [ArgumentError] if path doesn't exist or path doesn't end with 'barman'
-    attr_reader :binary 
+    attr_reader :binary
 
     # @overload barman_home
     #   @return [String] base path where barman stores its backups
@@ -118,7 +118,7 @@ module RBarman
       lines = run_barman_command("list-files --target wal #{server} #{backup_id}")
       wal_files = parse_wal_files_list(lines)
       xlog_db = read_xlog_db(server)
-      wal_files.each do |w| 
+      wal_files.each do |w|
         wal = "#{w.timeline}#{w.xlog}#{w.segment}"
         entry = xlog_db[wal]
         w.size = entry[:size]
@@ -179,7 +179,7 @@ module RBarman
         key, value = l.gsub("\t","").split(": ")
         case key.chomp
         when "ssh"
-          server.ssh_check_ok = value == "OK" ? true : false
+          server.ssh_check_ok = value =~ /OK/ ? true : false
         when "PostgreSQL"
           server.pg_conn_ok = value == "OK" ? true : false
         end
@@ -210,7 +210,7 @@ module RBarman
 
         status_match = l.match(/.+(FAILED|STARTED)/)
         status_match.nil? ? b.status = :done : b.status = status_match[1].downcase.to_sym
-        
+
         if b.status == :done
           sizematch = l.match(/.+Size:\s(\S+)\s(\S+)\s-.+Size:\s(\S+)\s(\S+)/)
           b.size = CliCommand.size_in_bytes(sizematch[1].to_f, sizematch[2])
@@ -275,7 +275,7 @@ module RBarman
     def self.size_in_bytes(size, unit)
       raise(ArgumentError, "unit not one of B|KiB|MiB|GiB|TiB") if !unit.match(/(B|KiB|MiB|GiB|TiB)/)
       size_b = 0
-      case unit 
+      case unit
       when "B"
         size_b = size
       when "KiB"
@@ -285,7 +285,7 @@ module RBarman
       when "GiB"
         size_b = size * 1024 ** 3
       when "TiB"
-        size_b = size * 1024 ** 4 
+        size_b = size * 1024 ** 4
       end
       return size_b.to_i
     end
