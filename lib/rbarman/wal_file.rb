@@ -81,6 +81,8 @@ module RBarman
 
     def compression=(compression)
       if compression != :gzip and
+        compression != :pygzip and
+        compression != :pybzip2 and
         compression != :bzip2 and
         compression != :none and
         compression != :custom
