@@ -190,11 +190,10 @@ module RBarman
     # @param [Array<String>] lines an array of lines like '/var/lib/barman/test/wals/00000001000005A9/00000001000005A9000000BC'
     # @return [WalFiles] the {WalFiles}
     def parse_wal_files_list(lines)
-      wal_files = Array.new
-      lines.each do |line|
-        wal_files << WalFile.parse(line.split("/").last)
+      lines.each_with_object([]) do |line, wal_files|
+        file_name = line.split('/').last
+        wal_files << WalFile.parse(file_name) if file_name.length == 24
       end
-      return wal_files
     end
 
     # Creates an array of {Backup} by parsing lines reported by barman
